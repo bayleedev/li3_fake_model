@@ -131,7 +131,7 @@ class Model {
 	 *
 	 * @param string $key - name of property to return, e.g.
 	 *                      'name' or 'source'
-	 * @param string $vla - ignored for now
+	 * @param string $val - ignored
 	 */
 	static public function meta($key=null, $val=null) {
 		$class = get_called_class();
