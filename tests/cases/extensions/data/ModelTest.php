@@ -87,6 +87,7 @@ class ModelTest extends \app\extensions\test\Unit {
 	}
 
 	public function testFirstSpeed() {
+		if(!isset($_GET['benchmark'])) return;
 		$record = MockRealModel::create(array(
 			'foo' => 'bar'
 		));
@@ -100,6 +101,7 @@ class ModelTest extends \app\extensions\test\Unit {
 	}
 
 	public function testAllSpeed() {
+		if(!isset($_GET['benchmark'])) return;
 		for($i=0; $i<100; $i++) {
 			$record = MockModel::create(array(
 				'foo' => 'bar'
