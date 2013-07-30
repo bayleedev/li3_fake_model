@@ -84,6 +84,20 @@ class ModelTest extends \app\extensions\test\Unit {
 		$this->assertEqual($record, $found);
 	}
 
+	public function testFirstWithOffset() {
+		$record = new MockModel(array('bar' => 'buz'));
+		$record->save();
+		$found = MockModel::first(array(), array('offset' => 1));
+		$this->assertEqual($record, $found);
+	}
+
+	public function testFirstWithOrder() {
+		$record = new MockModel(array('bar' => 'buz'));
+		$record->save();
+		$found = MockModel::first(array(), array('order' => array('bar' => 'desc')));
+		$this->assertEqual($record, $found);
+	}
+
 	public function testAll() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
@@ -96,6 +110,20 @@ class ModelTest extends \app\extensions\test\Unit {
 		$record->save();
 		$records = MockModel::all(array('bar' => 'buz'));
 		$this->assertEqual(array($record), $records);
+	}
+
+	public function testAllWithLimitAndOffset() {
+		$record = new MockModel(array('bar' => 'buz'));
+		$record->save();
+		$records = MockModel::all(array(), array('limit' => 1, 'offset' => 1));
+		$this->assertEqual(array($record), $records);
+	}
+
+	public function testAllWithOrder() {
+		$record = new MockModel(array('bar' => 'buz'));
+		$record->save();
+		$records = MockModel::all(array(), array('order' => array('bar' => 'desc')));
+		$this->assertEqual(array($record, $this->parent), $records);
 	}
 
 	public function testDataGetter() {

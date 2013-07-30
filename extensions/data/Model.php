@@ -100,9 +100,9 @@ class Model {
 	 * @param array $options
 	 */
 	static public function all($conditions=array(), $options=array()) {
-		$query = new Query(array(
+		$query = new Query($options + array(
 			'model' => get_called_class(),
-			'conditions' => $conditions
+			'conditions' => $conditions,
 		));
 		$db = static::connection();
 		$results = $db->read($query);
@@ -120,7 +120,7 @@ class Model {
 	 * @param array $options
 	 */
 	static public function first($conditions=array(), $options=array()) {
-		$query = new Query(array(
+		$query = new Query($options + array(
 			'model' => get_called_class(),
 			'conditions' => $conditions
 		));
