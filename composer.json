@@ -1,11 +1,16 @@
 {
-	"name": "mdx-dev/li3_fake_model",
+	"name": "li3_fake_model",
 	"type": "li3-libraries",
 	"description": "Lithium PHP alternative (fast) model implementation",
 	"keywords": ["relations", "li3", "lithium", "models"],
-	"homepage": "https://github.com/mdx-dev/li3_fake_model",
+	"homepage": "https://github.com/BlaineSch/li3_fake_model",
 	"license": "GNU General Public License",
 	"authors": [
+		{
+			"name": "Blaine Schmeisser",
+			"email": "BlaineSch@gmail.com",
+			"homepage": "https://github.com/BlaineSch"
+		},
 		{
 			"name": "Tim Morgan",
 			"email": "tim@timmorgan.org",
