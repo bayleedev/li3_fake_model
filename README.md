@@ -15,6 +15,7 @@ It doesn't do much, but that's kinda the point. Here's a comparison:
 | Works with SQL and Mongo | yes            | maybe [2]   |
 
 [1] Sort of. We wrap the native LI3 data source in our own to avoid the Document/DocumentSet madness.
+
 [2] I've only tested with MongoDB, but Fake Models could be adjusted to work with a SQL data source if someone wants to make the effort.
 
 ## Then why would I use this?
