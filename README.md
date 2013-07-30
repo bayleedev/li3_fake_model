@@ -11,10 +11,11 @@ It doesn't do much, but that's kinda the point. Here's a comparison:
 | Dirty Attributes         | yes            | no          |
 | Filterable (AOP)         | yes            | no          |
 | Schema Definition        | yes            | no          |
-| Uses LI3 Data Sources    | yes            | yes         |
-| Works with SQL and Mongo | yes            | maybe [1]   |
+| Uses LI3 Data Sources    | yes            | yes [1]     |
+| Works with SQL and Mongo | yes            | maybe [2]   |
 
-[1] I've only tested with MongoDB, but Fake Models could be adjusted to work with a SQL data source if someone wants to make the effort.
+[1] Sort of. We wrap the native LI3 data source in our own to avoid the Document/DocumentSet madness.
+[2] I've only tested with MongoDB, but Fake Models could be adjusted to work with a SQL data source if someone wants to make the effort.
 
 ## Then why would I use this?
 
@@ -22,6 +23,11 @@ You probably shouldn't. I mean, Fake Models do basically nothing! No one in thei
 
 OK, to be honest, Lithium Models are bloated and they're slow. They store lots of redundant data, and all the filterable methods (I suspect) contribute to their slowness.
 
-Here are some benchmarks:
+Here are some benchmarks...
 
-TODO
+|             | Count | Lithium Models | Fake Models |
+| ----------- | -----:| --------------:| -----------:|
+| first()     | 1     | 76ms           | 32ms        |
+| all()       | 100   | 2863ms         | 74ms        |
+
+Each test was with 100 iterations (divide each by 100 to get true timing).

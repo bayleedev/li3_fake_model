@@ -5,6 +5,7 @@ namespace li3_fake_model\tests\cases\extensions\data;
 use li3_fake_model\tests\mocks\extensions\data\MockModel;
 use li3_fake_model\tests\mocks\extensions\data\MockChildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockGrandchildModel;
+use li3_fake_model\tests\mocks\extensions\data\MockRealModel;
 
 use \app\models\ProviderPractices;
 
@@ -85,6 +86,48 @@ class ModelTest extends \app\extensions\test\Unit {
 	public function testNoRelation() {
 		$parent = MockModel::first();
 		$this->assertNull($parent->children);
+	}
+
+	public function testFirstSpeed() {
+		$record = MockRealModel::create(array(
+			'foo' => 'bar'
+		));
+		$record->save();
+		$this->benchmark('FakeModel::first()', function() {
+			MockModel::first();
+		});
+		$this->benchmark('RealModel::first()', function() {
+			MockRealModel::first();
+		});
+	}
+
+	public function testAllSpeed() {
+		for($i=0; $i<100; $i++) {
+			$record = MockModel::create(array(
+				'foo' => 'bar'
+			));
+			$record->save();
+			$record = MockRealModel::create(array(
+				'foo' => 'bar'
+			));
+			$record->save();
+		}
+		$this->benchmark('FakeModel::all()', function() {
+			$all = MockModel::all();
+			foreach($all as $rec) { }
+		});
+		$this->benchmark('RealModel::all()', function() {
+			$all = MockRealModel::all();
+			foreach($all as $rec) { } // force loading all records
+		});
+	}
+
+	public function benchmark($name, $func, $count=100) {
+		$start = microtime(TRUE);
+		for($i=0; $i<$count; $i++) {
+			$func();
+		}
+		echo "<pre>$name : " . round((microtime(TRUE) - $start) * 1000, 2) . ' ms</pre>';
 	}
 
 	//public function testFirstLevelRelation() {
