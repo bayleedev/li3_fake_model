@@ -7,8 +7,6 @@ use li3_fake_model\tests\mocks\extensions\data\MockChildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockGrandchildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockRealModel;
 
-use \app\models\ProviderPractices;
-
 use lithium\data\Connections;
 
 class ModelTest extends \app\extensions\test\Unit {
