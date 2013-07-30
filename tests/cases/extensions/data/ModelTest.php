@@ -38,6 +38,16 @@ class ModelTest extends \app\extensions\test\Unit {
 		$this->assertIdentical('mock_models', MockModel::meta('source'));
 	}
 
+	public function testSoureName() {
+		MockModel::$sourceName = 'widgets';
+		$record = new MockModel(array('foo' => 'bar'));
+		$record->save();
+		$collection = $this->db->widgets;
+		$record = $collection->findOne();
+		$this->assertIdentical('bar', $record['foo']);
+		MockModel::$sourceName = null; // put this back for other tests to work!
+	}
+
 	// ensure that record was inserted in setUp() method
 	public function testCreate() {
 		$collection = $this->db->mock_models;

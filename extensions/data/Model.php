@@ -14,6 +14,10 @@ class Model {
 	// Primary key identifier
 	public $primaryKey = '_id';
 
+	// Source (table/collection) name
+	// leave as null to infer from class name
+	static public $sourceName = null;
+
 	// Connection name
 	static public $connectionName = 'default';
 
@@ -140,7 +144,7 @@ class Model {
 		if($key == 'name') {
 			return $name;
 		} else if($key == 'source') {
-			return Inflector::tableize($name);
+			return static::$sourceName ? static::$sourceName : Inflector::tableize($name);
 		}
 	}
 
