@@ -77,9 +77,25 @@ class ModelTest extends \app\extensions\test\Unit {
 		$this->assertEqual($this->parent, $record);
 	}
 
+	public function testFirstWithCondition() {
+		$record = new MockModel(array('bar' => 'buz'));
+		$record->save();
+		$found = MockModel::first(array('bar' => 'buz'));
+		$this->assertEqual($record, $found);
+	}
+
 	public function testAll() {
+		$record = new MockModel(array('bar' => 'buz'));
+		$record->save();
 		$records = MockModel::all();
-		$this->assertEqual(array($this->parent), $records);
+		$this->assertEqual(array($this->parent, $record), $records);
+	}
+
+	public function testAllWithCondition() {
+		$record = new MockModel(array('bar' => 'buz'));
+		$record->save();
+		$records = MockModel::all(array('bar' => 'buz'));
+		$this->assertEqual(array($record), $records);
 	}
 
 	public function testDataGetter() {
