@@ -204,4 +204,11 @@ class ModelTest extends \app\extensions\test\Unit {
 		$this->assertNotEmpty($parent->children);
 	}
 
+	public function testParent() {
+		$item = MockGrandchildModel::first(array(), array(
+			'with' => array('MockChildModel'),
+		));
+		$this->assertNotEmpty($item->parent);
+	}
+
 }

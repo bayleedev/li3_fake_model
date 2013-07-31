@@ -152,7 +152,11 @@ class Model {
 			$fieldName = $relationship['fieldName'];
 			$fields = array();
 			foreach ($results as $result) {
-				$fields = $result->{$currentField};
+				if (is_array($result->{$currentField})) {
+					$fields = array_merge($fields, $result->{$currentField});
+				} else {
+					$fields[] = $result->{$currentField};
+				}
 			}
 			$records = $class::all(array(
 				$foreignField => array(
@@ -166,7 +170,7 @@ class Model {
 							$result->data[$fieldName][] = $record;
 						}
 					} elseif ($type === 'hasOne') {
-						if ($record->{$foreignField} === $result->$currentField) {
+						if ($record->{$foreignField} == $result->$currentField) {
 							$result->data[$fieldName] = $record;
 							continue;
 						}
