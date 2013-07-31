@@ -8,6 +8,7 @@ use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\util\Inflector;
 use lithium\data\entity\Document;
+use lithium\core\ConfigException;
 
 class Model {
 
@@ -28,6 +29,8 @@ class Model {
 	 * Use the accessor methods instead for full funcitonality.
 	 */
 	public $data = array();
+
+	static public $relationships = array('hasMany', 'hasOne');
 
 	/* Constructor - creates new instance of model object.
 	 * Note: does not save to the database.
@@ -120,6 +123,12 @@ class Model {
 	 * @param array $options
 	 */
 	static public function first($conditions=array(), $options=array()) {
+		$options += array(
+			'with' => array(),
+		);
+		$with = $options['with'];
+		unset($options['with']);
+
 		$query = new Query($options + array(
 			'model' => get_called_class(),
 			'conditions' => $conditions
@@ -127,8 +136,54 @@ class Model {
 		$db = static::connection();
 		$results = $db->read($query);
 		if(count($results) > 0) {
-			return new static($results[0]);
+			$results = static::relationships(array(new static($results[0])), $with);
+			return $results[0];
 		}
+	}
+
+	// setup relationships
+	static public function relationships($results, $with) {
+		$first = $results[0];
+		foreach ($with as $included) {
+			list($type, $relationship) = $first->retrieveRelationship($first, $included);
+			$class = $relationship['to'];
+			$currentField = key($relationship['key']);
+			$foreignField = current($relationship['key']);
+			$fieldName = $relationship['fieldName'];
+			$fields = array();
+			foreach ($results as $result) {
+				$fields = $result->{$currentField};
+			}
+			$records = $class::all(array(
+				$foreignField => array(
+					'$in' => $fields,
+				),
+			));
+			foreach ($results as $result) {
+				foreach ($records as $record) {
+					if ($type === 'hasMany') {
+						if (in_array($record->{$foreignField}, $result->$currentField)) {
+							$result->data[$fieldName][] = $record;
+						}
+					} elseif ($type === 'hasOne') {
+						if ($record->{$foreignField} === $result->$currentField) {
+							$result->data[$fieldName] = $record;
+							continue;
+						}
+					}
+				}
+			}
+		}
+		return $results;
+	}
+
+	public function retrieveRelationship($item, $relationship) {
+		foreach(static::$relationships as $type) {
+			if (!empty($this->{$type}) && isset($this->{$type}[$relationship])) {
+				return array($type, $this->{$type}[$relationship]);
+			}
+		}
+		throw new ConfigException('No relationship ' . $relationship . ' found');
 	}
 
 	/* Return meta information, for compatibility with LI3.

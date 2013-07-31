@@ -23,7 +23,9 @@ class ModelTest extends \app\extensions\test\Unit {
 		$this->grandchild->save();
 		$this->parent = MockModel::create(array(
 			'level'     => 1,
-			'child_ids' => array($this->child->_id),
+			'child_ids' => array(
+				$this->child->_id,
+			),
 		));
 		$this->parent->save();
 
@@ -195,11 +197,11 @@ class ModelTest extends \app\extensions\test\Unit {
 		echo "<pre>$name : " . round((microtime(TRUE) - $start) * 1000, 2) . ' ms</pre>';
 	}
 
-	//public function testFirstLevelRelation() {
-		//$parent = MockModel::first(array(), array(
-			//'with' => array('MockChildModel'),
-		//));
-		//$this->assertNotEmpty($parent->children);
-	//}
+	public function testFirstLevelRelation() {
+		$parent = MockModel::first(array(), array(
+			'with' => array('MockChildModel'),
+		));
+		$this->assertNotEmpty($parent->children);
+	}
 
 }
