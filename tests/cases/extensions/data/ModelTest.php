@@ -218,4 +218,32 @@ class ModelTest extends \app\extensions\test\Unit {
 		$this->assertEqual($this->child, $item->parent);
 	}
 
+	public function testHasManyToHasManyRelationship() {
+		$this->skipIf(true, 'Not yet implemented.');
+	}
+
+	public function testHasOneToHasManyRelationshiop() {
+		$this->skipIf(true, 'Not yet implemented.');
+	}
+
+	public function testHasOneToHasOneRelationshiop() {
+		$this->skipIf(true, 'Not yet implemented.');
+	}
+
+	public function testTwoLevelRelationshipHasCorrectResults() {
+		$this->skipIf(true, 'Not yet implemented.');
+	}
+
+	public function testTwoLevelRelationshipHasCorrectQueryCount() {
+		$this->skipIf(true, 'Not yet implemented.');
+	}
+
+	public function testThreeLevelRelationshipHasCorrectResults() {
+		$this->skipIf(true, 'Not yet implemented.');
+	}
+
+	public function testThreeLevelRelationshipHasCorrectQueryCount() {
+		$this->skipIf(true, 'Not yet implemented.');
+	}
+
 }
