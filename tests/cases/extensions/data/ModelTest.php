@@ -197,18 +197,25 @@ class ModelTest extends \app\extensions\test\Unit {
 		echo "<pre>$name : " . round((microtime(TRUE) - $start) * 1000, 2) . ' ms</pre>';
 	}
 
-	public function testFirstLevelRelation() {
+	public function testFirstLevelRelationCount() {
 		$parent = MockModel::first(array(), array(
 			'with' => array('MockChildModel'),
 		));
-		$this->assertNotEmpty($parent->children);
+		$this->assertCount(1, $parent->children);
 	}
 
-	public function testParent() {
+	public function testFirstLevelRelationItem() {
+		$parent = MockModel::first(array(), array(
+			'with' => array('MockChildModel'),
+		));
+		$this->assertEqual($this->child, $parent->children[0]);
+	}
+
+	public function testParentItem() {
 		$item = MockGrandchildModel::first(array(), array(
 			'with' => array('MockChildModel'),
 		));
-		$this->assertNotEmpty($item->parent);
+		$this->assertEqual($this->child, $item->parent);
 	}
 
 }
