@@ -20,11 +20,16 @@ class HasMany extends Relation {
 
 	public function results() {
 		$class = $this->meta['to'];
-		return $class::all(array(
-			current($this->meta['key']) => array(
-				'$in' => $this->retrieveFields(),
+		return $class::all(
+			array(
+				current($this->meta['key']) => array(
+					'$in' => $this->retrieveFields(),
+				),
 			),
-		));
+			array(
+				'with' => $this->with(),
+			)
+		);
 	}
 
 }

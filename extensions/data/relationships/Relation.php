@@ -8,8 +8,11 @@ abstract class Relation {
 
 	public $meta = array();
 
+	public $with = array();
+
 	public function __construct(array $meta = array()) {
 		$this->meta = $meta;
+		$this->with = array();
 	}
 
 	public function data(array $data = null) {
@@ -17,6 +20,13 @@ abstract class Relation {
 			return $this->data;
 		}
 		return $this->data = $data;
+	}
+
+	public function with(array $with = null) {
+		if ($with === null) {
+			return $this->with;
+		}
+		return $this->with = $with;
 	}
 
 	public function retrieveFields() {

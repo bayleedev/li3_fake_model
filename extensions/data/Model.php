@@ -134,6 +134,12 @@ class Model {
 	 * @param array $options
 	 */
 	static public function all($conditions=array(), $options=array()) {
+		$options += array(
+			'with' => array(),
+		);
+		$with = $options['with'];
+		unset($options['with']);
+
 		$query = new Query($options + array(
 			'model' => get_called_class(),
 			'conditions' => $conditions,
@@ -144,7 +150,7 @@ class Model {
 		foreach($results as $result) {
 			$records[] = new static($result);
 		}
-		return $records;
+		return static::relationships($records, $with);
 	}
 
 	/* Query a single record from the database
@@ -175,8 +181,10 @@ class Model {
 	// setup relationships
 	static public function relationships($results, $with) {
 		$first = $results[0];
-		foreach ($with as $included) {
-			$relationship = $first->retrieveRelationship($first, $included);
+		foreach ($with as $key => $value) {
+			$relationshipInfo = static::_determineChildInfo($key, $value);
+			$relationship = $first->retrieveRelationship($first, $relationshipInfo['name']);
+			$relationship->with($relationshipInfo['with']);
 			$relationship->data($results);
 			$relationship->appendData();
 			$results = $relationship->data();
@@ -184,10 +192,29 @@ class Model {
 		return $results;
 	}
 
-	public function retrieveRelationship($item, $relationship) {
+	/**
+	 * Will determine if `$key` is the relationship name, or numeric.
+	 * If this is the name, the value is the child's `with` statement.
+	 *
+	 * @return [type] [description]
+	 */
+	protected static function _determineChildInfo($key, $value) {
+		if (is_array($value)) {
+			return array(
+				'name' => $key,
+				'with' => $value,
+			);
+		}
+		return array(
+			'name' => $value,
+			'with' => array(),
+		);
+	}
+
+	public function retrieveRelationship($item, $name) {
 		foreach(static::$relationships as $type) {
-			if (!empty($this->{$type}) && isset($this->{$type}[$relationship])) {
-				return new $this->classes[$type]($this->{$type}[$relationship]);
+			if (!empty($this->{$type}) && isset($this->{$type}[$name])) {
+				return new $this->classes[$type]($this->{$type}[$name]);
 			}
 		}
 		throw new ConfigException('No relationship ' . $relationship . ' found');

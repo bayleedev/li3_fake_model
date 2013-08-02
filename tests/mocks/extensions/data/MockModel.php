@@ -2,7 +2,9 @@
 
 namespace li3_fake_model\tests\mocks\extensions\data;
 
-class MockModel extends \li3_fake_model\extensions\data\Model {
+use li3_fake_model\extensions\data\Model;
+
+class MockModel extends Model {
 
 	public $hasMany = array(
 		'MockChildModel' => array(

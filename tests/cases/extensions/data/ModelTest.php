@@ -6,6 +6,7 @@ use li3_fake_model\tests\mocks\extensions\data\MockModel;
 use li3_fake_model\tests\mocks\extensions\data\MockChildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockGrandchildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockRealModel;
+use li3_fake_model\tests\mocks\extensions\data\MockDogModel;
 
 use lithium\data\Connections;
 
@@ -16,9 +17,14 @@ class ModelTest extends \app\extensions\test\Unit {
 			'level'     => 2,
 		));
 		$this->child->save();
+		$this->dog = MockDogModel::create(array(
+			'name'     => 'Fido',
+		));
+		$this->dog->save();
 		$this->grandchild = MockGrandchildModel::create(array(
 			'level'     => 3,
 			'parent_id' => $this->child->_id,
+			'dog_id' => $this->dog->_id,
 		));
 		$this->grandchild->save();
 		$this->parent = MockModel::create(array(
@@ -226,11 +232,29 @@ class ModelTest extends \app\extensions\test\Unit {
 		$this->skipIf(true, 'Not yet implemented.');
 	}
 
-	public function testHasOneToHasOneRelationshiop() {
-		$this->skipIf(true, 'Not yet implemented.');
+	public function testHasOneToHasOneRelationshiopPersonWithDog() {
+		$person = MockGrandchildModel::first(array(), array(
+			'with' => array('MockDogModel'),
+		));
+		$this->assertEqual($this->dog, $person->dog);
+	}
+
+	public function testHasOneToHasOneRelationshiopDogWithPerson() {
+		$dog = MockDogModel::first(array(), array(
+			'with' => array('MockGrandchildModel'),
+		));
+		$this->assertEqual($this->grandchild, $dog->owner);
 	}
 
 	public function testTwoLevelRelationshipHasCorrectResults() {
+		$results = MockChildModel::first(array(), array(
+			'with' => array(
+				'MockGrandchildModel' => array(
+					'MockDogModel',
+				),
+			),
+		));
+		print_r($results);
 		$this->skipIf(true, 'Not yet implemented.');
 	}
 
