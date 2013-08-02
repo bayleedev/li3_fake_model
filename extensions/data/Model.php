@@ -183,7 +183,7 @@ class Model {
 		$first = $results[0];
 		foreach ($with as $key => $value) {
 			$relationshipInfo = static::_determineChildInfo($key, $value);
-			$relationship = $first->retrieveRelationship($first, $relationshipInfo['name']);
+			$relationship = $first->retrieveRelationship($relationshipInfo['name']);
 			$relationship->with($relationshipInfo['with']);
 			$relationship->data($results);
 			$relationship->appendData();
@@ -211,13 +211,16 @@ class Model {
 		);
 	}
 
-	public function retrieveRelationship($item, $name) {
+	public function retrieveRelationship($name) {
+		if (strrpos($name, '\\') !== false) {
+			$name = substr($name, strrpos($name, '\\') + 1);
+		}
 		foreach(static::$relationships as $type) {
 			if (!empty($this->{$type}) && isset($this->{$type}[$name])) {
 				return new $this->classes[$type]($this->{$type}[$name]);
 			}
 		}
-		throw new ConfigException('No relationship ' . $relationship . ' found');
+		throw new ConfigException('No relationship ' . $name . ' found in ' . get_called_class());
 	}
 
 	/* Return meta information, for compatibility with LI3.

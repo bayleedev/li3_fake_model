@@ -10,12 +10,21 @@ class HasMany extends Relation {
 		$fieldName = $this->meta['fieldName'];
 		foreach ($this->data as $data) {
 			foreach ($this->results() as $result) {
-				if (in_array($result->{$foreignField}, $data->{$currentField})) {
+				$reverseRelation = $result->retrieveRelationship(get_class($data));
+				$type = $reverseRelation instanceof $result->classes['hasOne'] ? 'hasOne' : 'hasMany';
+				if ($this->compare($type, $result->{$foreignField}, $data->{$currentField})) {
 					$data->data[$fieldName][] = $result;
 				}
 			}
 		}
 		return;
+	}
+
+	public function compare($type, $result1, $result2) {
+		if ($type === 'hasOne') {
+			return $result1 == $result2;
+		}
+		return in_array($result1, $result2);
 	}
 
 	public function results() {

@@ -247,13 +247,14 @@ class ModelTest extends \app\extensions\test\Unit {
 	}
 
 	public function testTwoLevelRelationshipHasCorrectResults() {
-		$results = MockChildModel::first(array(), array(
+		$child = MockChildModel::first(array(), array(
 			'with' => array(
 				'MockGrandchildModel' => array(
 					'MockDogModel',
 				),
 			),
 		));
+		$this->assertEqual($this->dog, $child->children[0]->dog);
 		print_r($results);
 		$this->skipIf(true, 'Not yet implemented.');
 	}
