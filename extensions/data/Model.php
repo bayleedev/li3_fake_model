@@ -30,7 +30,38 @@ class Model {
 	 */
 	public $data = array();
 
+	/**
+	 * Defined relationships.
+	 *
+	 * @var array
+	 */
 	static public $relationships = array('hasMany', 'hasOne');
+
+	public $hasMany = array();
+
+	public $hasOne = array();
+
+	/**
+	 * Relationship classes
+	 *
+	 * @var array
+	 */
+	public $classes = array(
+		'hasMany' => 'li3_fake_model\extensions\data\relationships\HasMany',
+		'hasOne' => 'li3_fake_model\extensions\data\relationships\HasOne',
+	);
+
+	/**
+	 * Stores model instances for internal use.
+	 *
+	 * While the `Model` public API does not require instantiation thanks to late static binding
+	 * introduced in PHP 5.3, LSB does not apply to class attributes. In order to prevent you
+	 * from needing to redeclare every single `Model` class attribute in subclasses, instances of
+	 * the models are stored and used internally.
+	 *
+	 * @var array
+	 */
+	protected static $_instances = array();
 
 	/* Constructor - creates new instance of model object.
 	 * Note: does not save to the database.
@@ -145,38 +176,10 @@ class Model {
 	static public function relationships($results, $with) {
 		$first = $results[0];
 		foreach ($with as $included) {
-			list($type, $relationship) = $first->retrieveRelationship($first, $included);
-			$class = $relationship['to'];
-			$currentField = key($relationship['key']);
-			$foreignField = current($relationship['key']);
-			$fieldName = $relationship['fieldName'];
-			$fields = array();
-			foreach ($results as $result) {
-				if (is_array($result->{$currentField})) {
-					$fields = array_merge($fields, $result->{$currentField});
-				} else {
-					$fields[] = $result->{$currentField};
-				}
-			}
-			$records = $class::all(array(
-				$foreignField => array(
-					'$in' => $fields,
-				),
-			));
-			foreach ($results as $result) {
-				foreach ($records as $record) {
-					if ($type === 'hasMany') {
-						if (in_array($record->{$foreignField}, $result->$currentField)) {
-							$result->data[$fieldName][] = $record;
-						}
-					} elseif ($type === 'hasOne') {
-						if ($record->{$foreignField} == $result->$currentField) {
-							$result->data[$fieldName] = $record;
-							continue;
-						}
-					}
-				}
-			}
+			$relationship = $first->retrieveRelationship($first, $included);
+			$relationship->data($results);
+			$relationship->appendData();
+			$results = $relationship->data();
 		}
 		return $results;
 	}
@@ -184,7 +187,7 @@ class Model {
 	public function retrieveRelationship($item, $relationship) {
 		foreach(static::$relationships as $type) {
 			if (!empty($this->{$type}) && isset($this->{$type}[$relationship])) {
-				return array($type, $this->{$type}[$relationship]);
+				return new $this->classes[$type]($this->{$type}[$relationship]);
 			}
 		}
 		throw new ConfigException('No relationship ' . $relationship . ' found');
@@ -230,6 +233,51 @@ class Model {
 			}
 		}
 		return static::$cachedConnection;
+	}
+
+	/**
+	 * Returns a list of models related to `Model`, or a list of models related
+	 * to this model, but of a certain type.
+	 *
+	 * If a relationship type is given, all of those relationships are returned.
+	 * If a model name is given, that relationship is returned.
+	 *
+	 * @param string $name Name of the model, or relation. Like 'hasMany' or 'MockPost'.
+	 * @return array An array of relation types.
+	 */
+	public static function relations($name = null) {
+		$self = static::_object();
+
+		if (isset(static::$relationships[$name])) {
+			return $self->{$name};
+		}
+
+		foreach (static::$relationships as $relationship) {
+			foreach ($self->{$relationship} as $key => $rel) {
+				if (in_array($name, array($key, $rel['to']))) {
+					return array(
+						'type' => $relationship,
+						'data' => $self->{$relationship}[$key],
+					);
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Will return a cached instance of the given class.
+	 *
+	 * @return object
+	 */
+	protected static function _object() {
+		$class = get_called_class();
+
+		if (!isset(static::$_instances[$class])) {
+			static::$_instances[$class] = new $class();
+		}
+		return static::$_instances[$class];
 	}
 
 }
