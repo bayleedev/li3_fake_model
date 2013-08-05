@@ -2,6 +2,8 @@
 
 namespace li3_fake_model\extensions\data\relationships;
 
+use lithium\core\ConfigException;
+
 class HasMany extends Relation {
 
 	public function appendData() {
@@ -10,8 +12,12 @@ class HasMany extends Relation {
 		$fieldName = $this->meta['fieldName'];
 		foreach ($this->data as $data) {
 			foreach ($this->results() as $result) {
-				$reverseRelation = $result->retrieveRelationship(get_class($data));
-				$type = $reverseRelation instanceof $result->classes['hasOne'] ? 'hasOne' : 'hasMany';
+				try {
+					$reverseRelation = $result->retrieveRelationship(get_class($data));
+					$type = $reverseRelation instanceof $result::$classes['hasOne'] ? 'hasOne' : 'hasMany';
+				} catch (ConfigException $e) {
+					$type = 'hasMany';
+				}
 				if ($this->compare($type, $result->{$foreignField}, $data->{$currentField})) {
 					$data->data[$fieldName][] = $result;
 				}
