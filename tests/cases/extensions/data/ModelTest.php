@@ -291,4 +291,13 @@ class ModelTest extends Unit {
 		});
 	}
 
+	public function testEmptyResult() {
+		$result = MockModel::first(array(
+			'conditions' => array(
+				'foo' => 'bar',
+			),
+		));
+		$this->assertEmpty($result);
+	}
+
 }
