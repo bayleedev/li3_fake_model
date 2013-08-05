@@ -168,7 +168,9 @@ class Model {
 	 * @return  mixed
 	 */
 	public static function first($conditions = array(), $options = array()) {
-		return static::find('first', $conditions, $options);
+		return static::find('first', $conditions, $options + array(
+			'limit' => 1,
+		));
 	}
 
 	/**
@@ -192,18 +194,15 @@ class Model {
 		));
 		$db = static::connection();
 		$results = $db->read($query);
+		foreach ($results as &$result) {
+			$result = new static($result);
+		}
+		$results = static::relationships($results, $with);
+
 		if ($type === 'first') {
-			$records = array(
-				$results[0],
-			);
-			$results = static::relationships($records, $with);
 			return $results[0];
 		}
-		$records = array();
-		foreach($results as $result) {
-			$records[] = new static($result);
-		}
-		return static::relationships($records, $with);
+		return $results;
 	}
 
 	/**
