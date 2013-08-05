@@ -225,14 +225,6 @@ class ModelTest extends Unit {
 		$this->assertEqual($this->child, $item->parent);
 	}
 
-	public function testHasManyToHasManyRelationship() {
-		$this->skipIf(true, 'Not yet implemented.');
-	}
-
-	public function testHasOneToHasManyRelationshiop() {
-		$this->skipIf(true, 'Not yet implemented.');
-	}
-
 	public function testHasOneToHasOneRelationshiopPersonWithDog() {
 		$person = MockGrandchildModel::first(array(), array(
 			'with' => array('MockDogModel'),
