@@ -2,8 +2,6 @@
 
 namespace li3_fake_model\extensions\data;
 
-use li3_fake_model\extensions\data\source\FakeMongoDb;
-
 use lithium\data\Connections;
 use lithium\data\model\Query;
 use lithium\util\Inflector;
@@ -46,9 +44,10 @@ class Model {
 	 *
 	 * @var array
 	 */
-	public $classes = array(
+	public static $classes = array(
 		'hasMany' => 'li3_fake_model\extensions\data\relationships\HasMany',
 		'hasOne' => 'li3_fake_model\extensions\data\relationships\HasOne',
+		'database' => 'li3_fake_model\extensions\data\source\FakeMongoDb',
 	);
 
 	/**
@@ -211,13 +210,19 @@ class Model {
 		);
 	}
 
+	/**
+	 * Retrusn a given relationship or throws `lithium\core\ConfigException`.
+	 *
+	 * @param  string $name
+	 * @return string
+	 */
 	public function retrieveRelationship($name) {
 		if (strrpos($name, '\\') !== false) {
 			$name = substr($name, strrpos($name, '\\') + 1);
 		}
 		foreach(static::$relationships as $type) {
 			if (!empty($this->{$type}) && isset($this->{$type}[$name])) {
-				return new $this->classes[$type]($this->{$type}[$name]);
+				return new static::$classes[$type]($this->{$type}[$name]);
 			}
 		}
 		throw new ConfigException('No relationship ' . $name . ' found in ' . get_called_class());
@@ -257,7 +262,8 @@ class Model {
 			$conn = Connections::get(static::$connectionName);
 			$connClass = get_class($conn);
 			if(preg_match('/MongoDb/', $connClass)) {
-				static::$cachedConnection = new FakeMongoDb($conn);
+				$db = static::$classes['database'];
+				static::$cachedConnection = new $db($conn);
 			} else {
 				throw 'not yet implemented';
 			}
