@@ -7,10 +7,11 @@ use li3_fake_model\tests\mocks\extensions\data\MockChildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockGrandchildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockRealModel;
 use li3_fake_model\tests\mocks\extensions\data\MockDogModel;
+use li3_fake_model\extensions\test\Unit;
 
 use lithium\data\Connections;
 
-class ModelTest extends \app\extensions\test\Unit {
+class ModelTest extends Unit {
 
 	public function setUp() {
 		$this->child = MockChildModel::create(array(
@@ -258,7 +259,16 @@ class ModelTest extends \app\extensions\test\Unit {
 	}
 
 	public function testTwoLevelRelationshipHasCorrectQueryCount() {
-		$this->skipIf(true, 'Not yet implemented.');
+		$class = 'li3_fake_model\tests\mocks\extensions\data\MockChildModel';
+		$this->assertQueryCount($class, 3, function() {
+			MockChildModel::first(array(), array(
+				'with' => array(
+					'MockGrandchildModel' => array(
+						'MockDogModel',
+					),
+				),
+			));
+		});
 	}
 
 	public function testThreeLevelRelationshipHasCorrectResults() {
@@ -275,7 +285,18 @@ class ModelTest extends \app\extensions\test\Unit {
 	}
 
 	public function testThreeLevelRelationshipHasCorrectQueryCount() {
-		$this->skipIf(true, 'Not yet implemented.');
+		$class = 'li3_fake_model\tests\mocks\extensions\data\MockModel';
+		$this->assertQueryCount($class, 4, function() {
+			MockModel::first(array(), array(
+				'with' => array(
+					'MockChildModel' => array(
+						'MockGrandchildModel' => array(
+							'MockDogModel',
+						),
+					)
+				),
+			));
+		});
 	}
 
 }
