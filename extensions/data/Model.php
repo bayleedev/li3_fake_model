@@ -199,7 +199,7 @@ class Model {
 		}
 		$results = static::relationships($results, $with);
 
-		if ($type === 'first') {
+		if ($type === 'first' && count($results) > 0) {
 			return $results[0];
 		}
 		return $results;
@@ -213,6 +213,9 @@ class Model {
 	 * @return  array
 	 */
 	public static function relationships($results, $with) {
+		if (count($results) === 0) {
+			return $results;
+		}
 		$first = $results[0];
 		foreach ($with as $key => $value) {
 			$relationshipInfo = static::_determineChildInfo($key, $value);
