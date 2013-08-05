@@ -15,16 +15,19 @@ class Model {
 
 	// Source (table/collection) name
 	// leave as null to infer from class name
-	static public $sourceName = null;
+	public static $sourceName = null;
 
 	// Connection name
-	static public $connectionName = 'default';
+	public static $connectionName = 'default';
 
 	// store cached copy of connection
 	static protected $cachedConnection = null;
 
-	/* Raw data.
+	/**
+	 * Raw data.
 	 * Use the accessor methods instead for full funcitonality.
+	 *
+	 * @var  array
 	 */
 	public $data = array();
 
@@ -33,7 +36,7 @@ class Model {
 	 *
 	 * @var array
 	 */
-	static public $relationships = array('hasMany', 'hasOne');
+	public static $relationships = array('hasMany', 'hasOne');
 
 	public $hasMany = array();
 
@@ -62,7 +65,8 @@ class Model {
 	 */
 	protected static $_instances = array();
 
-	/* Constructor - creates new instance of model object.
+	/**
+	 * Constructor - creates new instance of model object.
 	 * Note: does not save to the database.
 	 *
 	 * @param array $data - data to store in database
@@ -71,13 +75,19 @@ class Model {
 		$this->data = $data;
 	}
 
-	/* Returns boolean true if this record already exists in the database
+	/**
+	 * Returns boolean true if this record already exists in the database
+	 *
+	 * @return  bool
 	 */
 	public function exists() {
 		return !is_null($this->{$this->primaryKey});
 	}
 
-	/* Saves model data to the database.
+	/**
+	 * Saves model data to the database.
+	 *
+	 * @return  array
 	 */
 	public function save() {
 		$type = $this->exists() ? 'update' : 'create';
@@ -97,9 +107,13 @@ class Model {
 		return $result;
 	}
 
-	/* Returns the specific data property as if it were an actual top-level property.
+	/**
+	 * Returns the specific data property as if it were an actual top-level property.
 	 *
 	 * Alternatively, you can just use `$model->data[$prop]`
+	 *
+	 * @param  string $prop Key of the property you want.
+	 * @return mixed
 	 */
 	public function __get($prop) {
 		if(isset($this->data[$prop])) {
@@ -107,32 +121,65 @@ class Model {
 		}
 	}
 
-	/* Sets the specified data property.
+	/**
+	 * Sets the specified data property.
 	 *
 	 * Alternatively, you can just use `$model->data[$prop] = $val`
+	 *
+	 * @param   string $prop [description]
+	 * @param   mixed  $val  [description]
+	 * @return  mixed
 	 */
 	public function __set($prop, $val) {
 		return $this->data[$prop] = $val;
 	}
 
-	/* Create a new model object.
+	/**
+	 * Create a new model object.
 	 * Really just an alias for `new Model()`
 	 *
 	 * Note: Does not save to the database.
 	 *
-	 * @param array $data
+	 * @param   array $data
+	 * @return  object
 	 */
-	static public function create($data=array()) {
+	public static function create($data=array()) {
 		return new static($data);
 	}
 
-	/* Query all records from the database
+	/**
+	 * Query all records from the database
 	 * and return as an array.
 	 *
-	 * @param array $conditions
-	 * @param array $options
+	 * @param   array $conditions
+	 * @param   array $options
+	 * @return  array
 	 */
-	static public function all($conditions=array(), $options=array()) {
+	public static function all($conditions = array(), $options = array()) {
+		return static::find('all', $conditions, $options);
+	}
+
+	/**
+	 * Query a single record from the database
+	 * and return model instance.
+	 *
+	 * @param   array $conditions
+	 * @param   array $options
+	 * @return  mixed
+	 */
+	public static function first($conditions = array(), $options = array()) {
+		return static::find('first', $conditions, $options);
+	}
+
+	/**
+	 * Generic find.
+	 *
+	 * @param  string $type       Type of find: 'all' or 'first'.
+	 * @param  array  $conditions
+	 * @param  array  $options
+	 * @return mixed
+	 */
+	public static function find($type, $conditions = array(), $options = array()) {
 		$options += array(
 			'with' => array(),
 		);
@@ -145,6 +192,13 @@ class Model {
 		));
 		$db = static::connection();
 		$results = $db->read($query);
+		if ($type === 'first') {
+			$records = array(
+				$results[0],
+			);
+			$results = static::relationships($records, $with);
+			return $results[0];
+		}
 		$records = array();
 		foreach($results as $result) {
 			$records[] = new static($result);
@@ -152,33 +206,14 @@ class Model {
 		return static::relationships($records, $with);
 	}
 
-	/* Query a single record from the database
-	 * and return model instance.
+	/**
+	 * Setups up relationships.
 	 *
-	 * @param array $conditions
-	 * @param array $options
+	 * @param   array $results
+	 * @param   array $with
+	 * @return  array
 	 */
-	static public function first($conditions=array(), $options=array()) {
-		$options += array(
-			'with' => array(),
-		);
-		$with = $options['with'];
-		unset($options['with']);
-
-		$query = new Query($options + array(
-			'model' => get_called_class(),
-			'conditions' => $conditions
-		));
-		$db = static::connection();
-		$results = $db->read($query);
-		if(count($results) > 0) {
-			$results = static::relationships(array(new static($results[0])), $with);
-			return $results[0];
-		}
-	}
-
-	// setup relationships
-	static public function relationships($results, $with) {
+	public static function relationships($results, $with) {
 		$first = $results[0];
 		foreach ($with as $key => $value) {
 			$relationshipInfo = static::_determineChildInfo($key, $value);
@@ -228,13 +263,14 @@ class Model {
 		throw new ConfigException('No relationship ' . $name . ' found in ' . get_called_class());
 	}
 
-	/* Return meta information, for compatibility with LI3.
+	/**
+	 * Return meta information, for compatibility with LI3.
 	 *
 	 * @param string $key - name of property to return, e.g.
 	 *                      'name' or 'source'
 	 * @param string $val - ignored
 	 */
-	static public function meta($key=null, $val=null) {
+	public static function meta($key=null, $val=null) {
 		$class = get_called_class();
 		$parts = explode("\\", $class);
 		$name = $parts[count($parts)-1];
@@ -245,23 +281,29 @@ class Model {
 		}
 	}
 
-	/* Returns an empty schema array.
+	/**
+	 * Returns an empty schema array.
 	 *
 	 * We don't support schema, but LI3 Query still looks for it.
+	 *
+	 * @return  array
 	 */
-	static public function schema() {
+	public static function schema() {
 		return array();
 	}
 
-	/* Fetch and return the LI3 database connection named in
+	/**
+	 * Fetch and return the LI3 database connection named in
 	 * static $connectionName, wrapped in our own fake connection
 	 * adapter :-)
+	 *
+	 * @return  object Connection
 	 */
-	static public function connection() {
-		if(!isset(static::$cachedConnection)) {
+	public static function connection() {
+		if (!isset(static::$cachedConnection)) {
 			$conn = Connections::get(static::$connectionName);
 			$connClass = get_class($conn);
-			if(preg_match('/MongoDb/', $connClass)) {
+			if (preg_match('/MongoDb/', $connClass)) {
 				$db = static::$classes['database'];
 				static::$cachedConnection = new $db($conn);
 			} else {
