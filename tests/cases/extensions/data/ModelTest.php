@@ -6,19 +6,26 @@ use li3_fake_model\tests\mocks\extensions\data\MockModel;
 use li3_fake_model\tests\mocks\extensions\data\MockChildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockGrandchildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockRealModel;
+use li3_fake_model\tests\mocks\extensions\data\MockDogModel;
+use li3_fake_model\extensions\test\Unit;
 
 use lithium\data\Connections;
 
-class ModelTest extends \app\extensions\test\Unit {
+class ModelTest extends Unit {
 
 	public function setUp() {
 		$this->child = MockChildModel::create(array(
 			'level'     => 2,
 		));
 		$this->child->save();
+		$this->dog = MockDogModel::create(array(
+			'name'     => 'Fido',
+		));
+		$this->dog->save();
 		$this->grandchild = MockGrandchildModel::create(array(
 			'level'     => 3,
 			'parent_id' => $this->child->_id,
+			'dog_id' => $this->dog->_id,
 		));
 		$this->grandchild->save();
 		$this->parent = MockModel::create(array(
@@ -35,7 +42,7 @@ class ModelTest extends \app\extensions\test\Unit {
 	public function tearDown() {
 		$connection = Connections::get('default');
 		if(!preg_match('/_test$/', $connection->_config['database'])) {
-			throw new RuntimeException('test database not configured!');
+			throw new \RuntimeException('test database not configured!');
 		}
 		$mongo = $connection->connection;
 		foreach($mongo->listCollections() as $collection) {
@@ -197,18 +204,91 @@ class ModelTest extends \app\extensions\test\Unit {
 		echo "<pre>$name : " . round((microtime(TRUE) - $start) * 1000, 2) . ' ms</pre>';
 	}
 
-	public function testFirstLevelRelation() {
+	public function testFirstLevelRelationCount() {
 		$parent = MockModel::first(array(), array(
 			'with' => array('MockChildModel'),
 		));
-		$this->assertNotEmpty($parent->children);
+		$this->assertCount(1, $parent->children);
 	}
 
-	public function testParent() {
+	public function testFirstLevelRelationItem() {
+		$parent = MockModel::first(array(), array(
+			'with' => array('MockChildModel'),
+		));
+		$this->assertEqual($this->child, $parent->children[0]);
+	}
+
+	public function testParentItem() {
 		$item = MockGrandchildModel::first(array(), array(
 			'with' => array('MockChildModel'),
 		));
-		$this->assertNotEmpty($item->parent);
+		$this->assertEqual($this->child, $item->parent);
+	}
+
+	public function testHasOneToHasOneRelationshiopPersonWithDog() {
+		$person = MockGrandchildModel::first(array(), array(
+			'with' => array('MockDogModel'),
+		));
+		$this->assertEqual($this->dog, $person->dog);
+	}
+
+	public function testHasOneToHasOneRelationshiopDogWithPerson() {
+		$dog = MockDogModel::first(array(), array(
+			'with' => array('MockGrandchildModel'),
+		));
+		$this->assertEqual($this->grandchild, $dog->owner);
+	}
+
+	public function testTwoLevelRelationshipHasCorrectResults() {
+		$child = MockChildModel::first(array(), array(
+			'with' => array(
+				'MockGrandchildModel' => array(
+					'MockDogModel',
+				),
+			),
+		));
+		$this->assertEqual($this->dog, $child->children[0]->dog);
+	}
+
+	public function testTwoLevelRelationshipHasCorrectQueryCount() {
+		$class = 'li3_fake_model\tests\mocks\extensions\data\MockChildModel';
+		$this->assertQueryCount($class, 3, function() {
+			MockChildModel::first(array(), array(
+				'with' => array(
+					'MockGrandchildModel' => array(
+						'MockDogModel',
+					),
+				),
+			));
+		});
+	}
+
+	public function testThreeLevelRelationshipHasCorrectResults() {
+		$model = MockModel::first(array(), array(
+			'with' => array(
+				'MockChildModel' => array(
+					'MockGrandchildModel' => array(
+						'MockDogModel',
+					),
+				)
+			),
+		));
+		$this->assertEqual($this->dog, $model->children[0]->children[0]->dog);
+	}
+
+	public function testThreeLevelRelationshipHasCorrectQueryCount() {
+		$class = 'li3_fake_model\tests\mocks\extensions\data\MockModel';
+		$this->assertQueryCount($class, 4, function() {
+			MockModel::first(array(), array(
+				'with' => array(
+					'MockChildModel' => array(
+						'MockGrandchildModel' => array(
+							'MockDogModel',
+						),
+					)
+				),
+			));
+		});
 	}
 
 }
