@@ -255,8 +255,6 @@ class ModelTest extends \app\extensions\test\Unit {
 			),
 		));
 		$this->assertEqual($this->dog, $child->children[0]->dog);
-		print_r($results);
-		$this->skipIf(true, 'Not yet implemented.');
 	}
 
 	public function testTwoLevelRelationshipHasCorrectQueryCount() {
@@ -264,7 +262,16 @@ class ModelTest extends \app\extensions\test\Unit {
 	}
 
 	public function testThreeLevelRelationshipHasCorrectResults() {
-		$this->skipIf(true, 'Not yet implemented.');
+		$model = MockModel::first(array(), array(
+			'with' => array(
+				'MockChildModel' => array(
+					'MockGrandchildModel' => array(
+						'MockDogModel',
+					),
+				)
+			),
+		));
+		$this->assertEqual($this->dog, $model->children[0]->children[0]->dog);
 	}
 
 	public function testThreeLevelRelationshipHasCorrectQueryCount() {
