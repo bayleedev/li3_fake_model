@@ -300,4 +300,23 @@ class ModelTest extends Unit {
 		$this->assertEmpty($result);
 	}
 
+	public function testRecreatingRelationships() {
+		foreach (range(2, 10) as $level) {
+			MockModel::create(array(
+				'level'     => $level,
+				'child_ids' => array(
+					$this->child->_id,
+				),
+			))->save();
+		}
+		$class = 'li3_fake_model\tests\mocks\extensions\data\MockModel';
+		$this->assertQueryCount($class, 2, function() {
+			MockModel::all(array(), array(
+				'with' => array(
+					'MockChildModel',
+				),
+			));
+		});
+	}
+
 }
