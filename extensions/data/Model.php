@@ -7,6 +7,7 @@ use lithium\data\model\Query;
 use lithium\util\Inflector;
 use lithium\data\entity\Document;
 use lithium\core\ConfigException;
+use li3_fake_model\extensions\data\Collection;
 
 class Model {
 
@@ -184,6 +185,7 @@ class Model {
 	public static function find($type, $conditions = array(), $options = array()) {
 		$options += array(
 			'with' => array(),
+			'wrap' => true,
 		);
 		$with = $options['with'];
 		unset($options['with']);
@@ -202,7 +204,7 @@ class Model {
 		if ($type === 'first' && count($results) > 0) {
 			return $results[0];
 		}
-		return $results;
+		return new Collection($results);
 	}
 
 	/**
