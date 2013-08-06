@@ -38,7 +38,7 @@ class HasMany extends Relation {
 			return $this->results;
 		}
 		$class = $this->meta['to'];
-		return ($this->results = $class::all(
+		return $this->results = $class::all(
 			array(
 				current($this->meta['key']) => array(
 					'$in' => $this->retrieveFields(),
@@ -47,7 +47,7 @@ class HasMany extends Relation {
 			array(
 				'with' => $this->with(),
 			)
-		));
+		);
 	}
 
 }

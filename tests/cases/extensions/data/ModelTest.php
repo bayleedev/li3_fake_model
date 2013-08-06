@@ -8,6 +8,7 @@ use li3_fake_model\tests\mocks\extensions\data\MockGrandchildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockRealModel;
 use li3_fake_model\tests\mocks\extensions\data\MockDogModel;
 use li3_fake_model\extensions\test\Unit;
+use li3_fake_model\extensions\data\Collection;
 
 use lithium\data\Connections;
 
@@ -122,28 +123,28 @@ class ModelTest extends Unit {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
 		$records = MockModel::all();
-		$this->assertEqual(array($this->parent, $record), $records);
+		$this->assertEqual(array($this->parent, $record), $records->data);
 	}
 
 	public function testAllWithCondition() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
 		$records = MockModel::all(array('bar' => 'buz'));
-		$this->assertEqual(array($record), $records);
+		$this->assertEqual(array($record), $records->data);
 	}
 
 	public function testAllWithLimitAndOffset() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
 		$records = MockModel::all(array(), array('limit' => 1, 'offset' => 1));
-		$this->assertEqual(array($record), $records);
+		$this->assertEqual(array($record), $records->data);
 	}
 
 	public function testAllWithOrder() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
 		$records = MockModel::all(array(), array('order' => array('bar' => 'desc')));
-		$this->assertEqual(array($record, $this->parent), $records);
+		$this->assertEqual(array($record, $this->parent), $records->data);
 	}
 
 	public function testDataGetter() {
@@ -297,7 +298,7 @@ class ModelTest extends Unit {
 				'foo' => 'bar',
 			),
 		));
-		$this->assertEmpty($result);
+		$this->assertEmpty($result->data);
 	}
 
 	public function testRecreatingRelationships() {
