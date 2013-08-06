@@ -10,6 +10,8 @@ abstract class Relation {
 
 	public $with = array();
 
+	public $results = array();
+
 	public function __construct(array $meta = array()) {
 		$this->meta = $meta;
 		$this->with = array();
@@ -30,16 +32,19 @@ abstract class Relation {
 	}
 
 	public function retrieveFields() {
+		if (!empty($this->fields)) {
+			return $this->fields;
+		}
 		$fields = array();
 		$currentField = key($this->meta['key']);
-		foreach ($this->data as $data) {
-			if (is_array($data->{$currentField})) {
-				$fields = array_merge($fields, $data->{$currentField});
+		foreach ($this->data as $key => $data) {
+			if (is_array($data->data[$currentField])) {
+				$fields = array_merge($fields, $data->data[$currentField]);
 			} else {
-				$fields[] = $data->{$currentField};
+				$fields[] = $data->data[$currentField];
 			}
 		}
-		return $fields;
+		return ($this->fields = array_unique($fields));
 	}
 
 	public abstract function appendData();

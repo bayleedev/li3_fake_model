@@ -213,7 +213,7 @@ class Model {
 	 * @return  array
 	 */
 	public static function relationships($results, $with) {
-		if (count($results) === 0) {
+		if (count($results) === 0 || count($with) === 0) {
 			return $results;
 		}
 		$first = $results[0];

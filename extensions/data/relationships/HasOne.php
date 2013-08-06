@@ -8,8 +8,8 @@ class HasOne extends Relation {
 		$foreignField = current($this->meta['key']);
 		$currentField = key($this->meta['key']);
 		$fieldName = $this->meta['fieldName'];
-		foreach ($this->data as $data) {
-			foreach ($this->results() as $result) {
+		foreach ($this->results() as $result) {
+			foreach ($this->data as $data) {
 				if ($result->{$foreignField} == $data->{$currentField}) {
 					$data->data[$fieldName] = $result;
 				}
@@ -19,8 +19,11 @@ class HasOne extends Relation {
 	}
 
 	public function results() {
+		if (!empty($this->results)) {
+			return $this->results;
+		}
 		$class = $this->meta['to'];
-		return $class::all(
+		return ($this->results = $class::all(
 			array(
 				current($this->meta['key']) => array(
 					'$in' => $this->retrieveFields(),
@@ -29,7 +32,7 @@ class HasOne extends Relation {
 			array(
 				'with' => $this->with(),
 			)
-		);
+		));
 	}
 
 }
