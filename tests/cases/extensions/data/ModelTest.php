@@ -150,6 +150,10 @@ class ModelTest extends Unit {
 		$this->assertIdentical(1, $this->parent->level);
 	}
 
+	public function testDataIsset() {
+		$this->assertIdentical(true, isset($this->parent->level));
+	}
+
 	public function testDataSetter() {
 		$this->parent->level = 100;
 		$this->assertIdentical(100, $this->parent->data['level']);

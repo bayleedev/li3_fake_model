@@ -108,6 +108,18 @@ class Model {
 	}
 
 	/**
+	 * Returns true if the specific data property exists.
+	 *
+	 * Alternatively, you can just use `isset($model->data[$prop])`
+	 *
+	 * @param  string $prop Key of the property you want.
+	 * @return boolean
+	 */
+	public function __isset($prop) {
+		return isset($this->data[$prop]);
+	}
+
+	/**
 	 * Returns the specific data property as if it were an actual top-level property.
 	 *
 	 * Alternatively, you can just use `$model->data[$prop]`
