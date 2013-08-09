@@ -32,6 +32,14 @@ class Model {
 	public $data = array();
 
 	/**
+	 * Relation data.
+	 * Use the accessor methods instead for full funcitonality.
+	 *
+	 * @var  array
+	 */
+	public $relData = array();
+
+	/**
 	 * Defined relationships.
 	 *
 	 * @var array
@@ -116,8 +124,11 @@ class Model {
 	 * @return mixed
 	 */
 	public function __get($prop) {
-		if(isset($this->data[$prop])) {
+		if (isset($this->data[$prop])) {
 			return $this->data[$prop];
+		}
+		if (isset($this->relData[$prop])) {
+			return $this->relData[$prop];
 		}
 	}
 
@@ -131,7 +142,10 @@ class Model {
 	 * @return  mixed
 	 */
 	public function __set($prop, $val) {
-		return $this->data[$prop] = $val;
+		if (isset($this->relData[$prop])) {
+			return ($this->relData[$prop] = $val);
+		}
+		return ($this->data[$prop] = $val);
 	}
 
 	/**

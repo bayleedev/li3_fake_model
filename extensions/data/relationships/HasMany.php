@@ -19,7 +19,7 @@ class HasMany extends Relation {
 					$type = 'hasMany';
 				}
 				if ($this->compare($type, $result->{$foreignField}, $data->{$currentField})) {
-					$data->data[$fieldName][] = $result;
+					$data->relData[$fieldName][] = $result;
 				}
 			}
 		}

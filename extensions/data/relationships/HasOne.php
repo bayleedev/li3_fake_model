@@ -11,7 +11,7 @@ class HasOne extends Relation {
 		foreach ($this->results() as $result) {
 			foreach ($this->data as $data) {
 				if ($result->{$foreignField} == $data->{$currentField}) {
-					$data->data[$fieldName] = $result;
+					$data->relData[$fieldName] = $result;
 				}
 			}
 		}
