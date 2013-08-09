@@ -1,0 +1,15 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+
+before_install:
+  - cd ../
+  - git clone git://github.com/UnionOfRAD/framework.git
+  - mv li3_fake_model/ framework/app/libraries/li3_fake_model
+  - cd framework
+  - git submodule update --init --recursive
+  - cd app/libraries/li3_fake_model
+
+script: ../../../libraries/lithium/console/li3 test tests
