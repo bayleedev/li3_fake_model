@@ -323,4 +323,34 @@ class ModelTest extends Unit {
 		});
 	}
 
+	public function testThreeLevelRelationshipHasCorrectQueries() {
+		$class = 'li3_fake_model\tests\mocks\extensions\data\MockModel';
+		$queries = array(
+			array(
+				'name' => 'mock_models',
+				'limit' => 1,
+			),
+			array(
+				'conditions' => array(
+					'_id' => array(
+						'$in' => array(
+							$this->child->_id,
+						),
+					),
+				),
+				'name' => 'mock_child_models',
+				'limit' => 10,
+			),
+		);
+		$this->assertQueries($class, $queries, function() {
+			MockModel::first(array(), array(
+				'with' => array(
+					'MockChildModel' => array(
+						'limit' => 10,
+					)
+				),
+			));
+		});
+	}
+
 }

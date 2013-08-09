@@ -3,10 +3,10 @@
 namespace li3_fake_model\extensions\data;
 
 use lithium\data\Connections;
-use lithium\data\model\Query;
 use lithium\util\Inflector;
 use lithium\data\entity\Document;
 use lithium\core\ConfigException;
+use li3_fake_model\extensions\data\model\Query;
 
 class Model {
 
