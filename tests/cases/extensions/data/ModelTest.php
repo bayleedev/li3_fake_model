@@ -51,7 +51,7 @@ class ModelTest extends Unit {
 	}
 
 	public function testMetaName() {
-		$this->assertIdentical('MockModel', MockModel::meta('name'));
+		$this->assertIdentical('mockmodel', MockModel::meta('name'));
 	}
 
 	public function testMetaSource() {
@@ -243,7 +243,7 @@ class ModelTest extends Unit {
 		$child = MockChildModel::first(array(), array(
 			'with' => array(
 				'MockGrandchildModel' => array(
-					'MockDogModel',
+					'with' => array('MockDogModel'),
 				),
 			),
 		));
@@ -256,7 +256,7 @@ class ModelTest extends Unit {
 			MockChildModel::first(array(), array(
 				'with' => array(
 					'MockGrandchildModel' => array(
-						'MockDogModel',
+						'with' => array('MockDogModel'),
 					),
 				),
 			));
@@ -267,10 +267,12 @@ class ModelTest extends Unit {
 		$model = MockModel::first(array(), array(
 			'with' => array(
 				'MockChildModel' => array(
-					'MockGrandchildModel' => array(
-						'MockDogModel',
+					'with' => array(
+						'MockGrandchildModel' => array(
+							'with' => array('MockDogModel'),
+						),
 					),
-				)
+				),
 			),
 		));
 		$this->assertEqual($this->dog, $model->children[0]->children[0]->dog);
@@ -282,8 +284,10 @@ class ModelTest extends Unit {
 			MockModel::first(array(), array(
 				'with' => array(
 					'MockChildModel' => array(
-						'MockGrandchildModel' => array(
-							'MockDogModel',
+						'with' => array(
+							'MockGrandchildModel' => array(
+								'with' => array('MockDogModel'),
+							),
 						),
 					)
 				),

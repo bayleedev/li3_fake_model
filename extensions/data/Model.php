@@ -220,7 +220,7 @@ class Model {
 		foreach ($with as $key => $value) {
 			$relationshipInfo = static::_determineChildInfo($key, $value);
 			$relationship = $first->retrieveRelationship($relationshipInfo['name']);
-			$relationship->with($relationshipInfo['with']);
+			$relationship->options($relationshipInfo['options']);
 			$relationship->data($results);
 			$relationship->appendData();
 			$results = $relationship->data();
@@ -238,12 +238,12 @@ class Model {
 		if (is_array($value)) {
 			return array(
 				'name' => $key,
-				'with' => $value,
+				'options' => $value,
 			);
 		}
 		return array(
 			'name' => $value,
-			'with' => array(),
+			'options' => array(),
 		);
 	}
 
@@ -272,14 +272,14 @@ class Model {
 	 *                      'name' or 'source'
 	 * @param string $val - ignored
 	 */
-	public static function meta($key=null, $val=null) {
+	public static function meta($key = null, $val = null) {
 		$class = get_called_class();
 		$parts = explode("\\", $class);
 		$name = $parts[count($parts)-1];
 		if($key == 'name') {
-			return $name;
+			return strtolower($name);
 		} else if($key == 'source') {
-			return static::$sourceName ? static::$sourceName : Inflector::tableize($name);
+			return static::$sourceName ? static::$sourceName : strtolower(Inflector::tableize($name));
 		}
 	}
 

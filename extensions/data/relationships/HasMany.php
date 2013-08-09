@@ -44,9 +44,7 @@ class HasMany extends Relation {
 					'$in' => $this->retrieveFields(),
 				),
 			),
-			array(
-				'with' => $this->with(),
-			)
+			$this->options()
 		));
 	}
 
