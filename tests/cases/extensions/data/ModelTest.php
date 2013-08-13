@@ -41,9 +41,6 @@ class ModelTest extends Unit {
 
 	public function tearDown() {
 		$connection = Connections::get('default');
-		if(!preg_match('/_test$/', $connection->_config['database'])) {
-			throw new \RuntimeException('test database not configured!');
-		}
 		$mongo = $connection->connection;
 		foreach($mongo->listCollections() as $collection) {
 			$collection->drop();

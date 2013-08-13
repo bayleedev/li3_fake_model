@@ -11,5 +11,6 @@ before_install:
   - cd framework
   - git submodule update --init --recursive
   - cd app/libraries/li3_fake_model
+  - cp config/bootstrap/_connections.php config/bootstrap.php
 
 script: ../../../libraries/lithium/console/li3 test tests
