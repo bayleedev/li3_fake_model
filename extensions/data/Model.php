@@ -323,7 +323,7 @@ class Model {
 				$db = static::$classes['database'];
 				static::$cachedConnection = new $db($conn);
 			} else {
-				throw 'not yet implemented';
+				throw new ConfigException('not yet implemented');
 			}
 		}
 		return static::$cachedConnection;
