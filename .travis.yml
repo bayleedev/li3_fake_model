@@ -10,7 +10,10 @@ before_install:
   - mv li3_fake_model/ framework/app/libraries/li3_fake_model
   - cd framework
   - git submodule update --init --recursive
-  - cd app/libraries/li3_fake_model
+  - cd libraries/lithium
+  - git remote rm origin && git remote add origin git@github.com:mdx-dev/lithium.git
+  - git fetch origin && git checkout master && git reset --hard origin/master
+  - cd ../../app/libraries/li3_fake_model
   - cp config/bootstrap/_connections.php config/bootstrap.php
 
 script: ../../../libraries/lithium/console/li3 test tests
