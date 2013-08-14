@@ -199,7 +199,7 @@ class Model {
 		$options += array(
 			'with' => array(),
 		);
-		$with = $options['with'];
+		$with = static::mergeWith($options['with']);
 		unset($options['with']);
 
 		$query = new Query($options + array(
@@ -217,6 +217,27 @@ class Model {
 			return $results[0];
 		}
 		return $results;
+	}
+
+	/**
+	 * Will merge the current 'with' option with defaults set in the models.
+	 *
+	 * @param  array $with
+	 * @return array
+	 */
+	public static function mergeWith(array $with) {
+		foreach ($with as $name => $trueOptions) {
+			if (is_int($name)) {
+				unset($with[$name]);
+				$name = $trueOptions;
+				$with[$name] = $trueOptions = array();
+			}
+			$relation = static::relations($name);
+			if (isset($relation['data']['options'])) {
+				$with[$name] += $relation['data']['options'];
+			}
+		}
+		return $with;
 	}
 
 	/**

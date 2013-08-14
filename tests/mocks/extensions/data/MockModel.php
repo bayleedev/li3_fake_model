@@ -11,6 +11,9 @@ class MockModel extends Model {
 			'to'        => 'li3_fake_model\tests\mocks\extensions\data\MockChildModel',
 			'key'       => array('child_ids' => '_id'),
 			'fieldName' => 'children',
+			'options'   => array(
+				'limit' => 10,
+			),
 		),
 	);
 
