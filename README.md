@@ -48,7 +48,7 @@ class Posts extends Model {
   public $hasMany = array(
     'Comments' => array(
       'to'        => 'Comments',
-      'key'       => array('_ids' => 'comment_id'),
+      'key'       => array('_id' => 'comment_id'),
       // or, you can use an array of foreign keys, e.g. array('comment_ids' => '_id')
       'fieldName' => 'comments',
     ),
