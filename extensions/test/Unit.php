@@ -61,7 +61,7 @@ class Unit extends \lithium\test\Unit {
 		});
 		$query->__invoke();
 		$connection->applyFilter('read', false);
-		return $this->assertEqual($result == $expected, $message, compact('expected', 'result'));
+		return $this->assertEqual($expected, $result, $message, compact('expected', 'result'));
 	}
 
 }
