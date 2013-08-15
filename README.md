@@ -30,7 +30,7 @@ Here are some benchmarks...
 |             | Count | Lithium Models | Fake Models |
 | ----------- | -----:| --------------:| -----------:|
 | first()     | 1     | 76ms           | 32ms        |
-| all()       | 100   | 2863ms         | 74ms        |
+| all()       | 100   | 2863ms         | 78ms        |
 
 Each test was with 100 iterations (divide each by 100 to get true timing).
 
