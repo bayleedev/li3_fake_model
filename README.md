@@ -57,7 +57,7 @@ class Posts extends Model {
 }
 ```
 
-*2. Query your model and tell it wich relationships to fetch.*
+*2. Query your model and tell it which relationships to fetch.*
 
 ```php
 $posts = Posts::all(array(
