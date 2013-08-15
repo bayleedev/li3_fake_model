@@ -124,7 +124,7 @@ class Model {
 	 * @return boolean
 	 */
 	public function __isset($prop) {
-		return isset($this->data[$prop]);
+		return isset($this->data[$prop]) || isset($this->relData[$prop]);
 	}
 
 	/**

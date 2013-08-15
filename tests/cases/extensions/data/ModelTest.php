@@ -152,6 +152,13 @@ class ModelTest extends Unit {
 		$this->assertIdentical(false, isset($this->parent->unknown));
 	}
 
+	public function testRelationalDataIsset() {
+		$person = MockGrandchildModel::first(array(), array(
+			'with' => array('MockDogModel'),
+		));
+		$this->assertIdentical(true, isset($person->dog));
+	}
+
 	public function testDataSetter() {
 		$this->parent->level = 100;
 		$this->assertIdentical(100, $this->parent->data['level']);
