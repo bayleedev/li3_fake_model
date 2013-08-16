@@ -8,11 +8,10 @@ class HasOne extends Relation {
 		$foreignField = current($this->meta['key']);
 		$currentField = key($this->meta['key']);
 		$fieldName = $this->meta['fieldName'];
-		foreach ($this->data as $data) {
-			foreach ($this->results() as $result) {
+		foreach ($this->results() as $result) {
+			foreach ($this->data as $data) {
 				if (is_array($data->{$currentField}) && in_array($result->{$foreignField}, $data->{$currentField})) {
-					$data->relData[$fieldName] = $result;
-					break;
+					if (!isset($data->relData[$fieldName])) $data->relData[$fieldName] = $result;
 				} else if ($result->{$foreignField} == $data->{$currentField}) {
 					$data->relData[$fieldName] = $result;
 				}
