@@ -1,6 +1,6 @@
 {
 	"name": "blainesch/li3_fake_model",
-	"type": "li3-libraries",
+	"type": "lithium-library",
 	"description": "Lithium PHP alternative (fast) model implementation",
 	"keywords": ["relations", "li3", "lithium", "models"],
 	"homepage": "https://github.com/BlaineSch/li3_fake_model",
