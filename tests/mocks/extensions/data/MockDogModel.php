@@ -14,4 +14,12 @@ class MockDogModel extends Model {
 		),
 	);
 
+	public $hasMany = array(
+		'Bones' => array(
+			'to'        => 'li3_fake_model\tests\mocks\extensions\data\MockBoneModel',
+			'key'       => array('bone_ids' => '_id'),
+			'fieldName' => 'bones',
+		),
+	);
+
 }
