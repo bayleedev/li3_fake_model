@@ -15,14 +15,35 @@ use lithium\data\Connections;
 class ModelTest extends Unit {
 
 	public function setUp() {
+		$this->bones = array(
+			MockBoneModel::create(array(
+				'name' => 'Antler',
+			)),
+			MockBoneModel::create(array(
+				'name' => 'Pig Ear',
+			)),
+		);
+		$this->bones[0]->save();
+		$this->bones[1]->save();
 		$this->child = MockChildModel::create(array(
 			'level'     => 2,
 		));
 		$this->child->save();
 		$this->dog = MockDogModel::create(array(
 			'name'     => 'Fido',
+			'bone_ids' => array(
+				$this->bones[0]->_id,
+				$this->bones[1]->_id,
+			),
 		));
 		$this->dog->save();
+		$this->dog2 = MockDogModel::create(array(
+			'name'     => 'Koda',
+			'bone_ids' => array(
+				$this->bones[0]->_id,
+			),
+		));
+		$this->dog2->save();
 		$this->grandchild = MockGrandchildModel::create(array(
 			'level'     => 3,
 			'parent_id' => $this->child->_id,
@@ -403,6 +424,20 @@ class ModelTest extends Unit {
 			'with' => array('FavoriteDog')
 		));
 		$this->assertEqual($dog2, $master->favoriteDog);
+	}
+
+	public function testHasManyToHasManyRelOnParent() {
+		$dog = MockDogModel::first(array('name' => 'Fido'), array(
+			'with' => array('Bones'),
+		));
+		$this->assertCount(2, $dog->bones);
+	}
+
+	public function testHasManyToHasManyRelOnChild() {
+		$bone = MockBoneModel::first(array('name' => 'Antler'), array(
+			'with' => array('Dogs'),
+		));
+		$this->assertCount(2, $bone->dogs);
 	}
 
 }

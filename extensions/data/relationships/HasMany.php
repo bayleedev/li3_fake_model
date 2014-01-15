@@ -30,6 +30,9 @@ class HasMany extends Relation {
 		if ($type === 'hasOne') {
 			return $result1 == $result2;
 		}
+		if (!is_array($result2)) {
+			return in_array($result2, $result1);
+		}
 		return in_array($result1, $result2);
 	}
 
