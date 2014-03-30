@@ -2,6 +2,8 @@
 
 *For those times when you don't want a real one*
 
+[![Build Status](https://travis-ci.org/blainesch/li3_fake_model.svg?branch=master)](https://travis-ci.org/blainesch/li3_fake_model)
+
 This library is for the PHP Lithium Web Framework and provides an alternative to its built-in data models.
 
 It doesn't do much, but that's kinda the point. Here's a comparison:
