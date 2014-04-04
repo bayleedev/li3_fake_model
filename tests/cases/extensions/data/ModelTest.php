@@ -8,6 +8,7 @@ use li3_fake_model\tests\mocks\extensions\data\MockGrandchildModel;
 use li3_fake_model\tests\mocks\extensions\data\MockRealModel;
 use li3_fake_model\tests\mocks\extensions\data\MockDogModel;
 use li3_fake_model\tests\mocks\extensions\data\MockMasterModel;
+use li3_fake_model\tests\mocks\extensions\data\MockBoneModel;
 use li3_fake_model\extensions\test\Unit;
 
 use lithium\data\Connections;
