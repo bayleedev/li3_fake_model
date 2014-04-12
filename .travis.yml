@@ -8,7 +8,7 @@ services:
   - mongodb
 
 before_install:
-  - pecl -q install mongo && echo "extension=mongo.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+  - pecl install -f mongo-1.2.12
   - cd ../
   - git clone git://github.com/UnionOfRAD/framework.git
   - mv li3_fake_model/ framework/app/libraries/li3_fake_model
