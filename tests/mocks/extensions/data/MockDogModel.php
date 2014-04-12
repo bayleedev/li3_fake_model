@@ -6,6 +6,20 @@ use li3_fake_model\extensions\data\Model;
 
 class MockDogModel extends Model {
 
+	public $hasOneEmbedded = array(
+		'MockFlea' => array(
+			'to'        => 'li3_fake_model\tests\mocks\extensions\data\MockFleaModel',
+			'fieldName' => 'flea',
+		),
+	);
+
+	public $hasManyEmbedded = array(
+		'MockFleas' => array(
+			'to'        => 'li3_fake_model\tests\mocks\extensions\data\MockFleaModel',
+			'fieldName' => 'fleas',
+		),
+	);
+
 	public $hasOne = array(
 		'MockGrandchildModel' => array(
 			'to'        => 'li3_fake_model\tests\mocks\extensions\data\MockGrandchildModel',
