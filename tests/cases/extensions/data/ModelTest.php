@@ -36,10 +36,17 @@ class ModelTest extends Unit {
 				$this->bones[0]->_id,
 				$this->bones[1]->_id,
 			),
+			'fleas' => array(
+				array('size' => 'small'),
+				array('size' => 'medium'),
+			),
 		));
 		$this->dog->save();
 		$this->dog2 = MockDogModel::create(array(
 			'name'     => 'Koda',
+			'flea' => array(
+				'size' => 'small',
+			),
 			'bone_ids' => array(
 				$this->bones[0]->_id,
 			),
@@ -439,6 +446,51 @@ class ModelTest extends Unit {
 			'with' => array('Dogs'),
 		));
 		$this->assertCount(2, $bone->dogs);
+	}
+
+	public function testDogHasFlea() {
+		$dog = MockDogModel::find('first', array(
+			'_id' => $this->dog2->_id,
+		), array(
+			'with' => array(
+				'MockFlea',
+			),
+		));
+		$this->assertInstanceOf('li3_fake_model\tests\mocks\extensions\data\MockFleaModel', $dog->flea);
+	}
+
+	public function testDogHasNoFlea() {
+		$dog = MockDogModel::find('first', array(
+			'_id' => $this->dog->_id,
+		), array(
+			'with' => array(
+				'MockFlea',
+			),
+		));
+		$this->assertNotInstanceOf('li3_fake_model\tests\mocks\extensions\data\MockFleaModel', $dog->flea);
+	}
+
+	public function testDogHasFleas() {
+		$dog = MockDogModel::find('first', array(
+			'_id' => $this->dog->_id,
+		), array(
+			'with' => array(
+				'MockFleas',
+			),
+		));
+		$this->assertInternalType('array', $dog->fleas);
+		$this->assertInstanceOf('li3_fake_model\tests\mocks\extensions\data\MockFleaModel', $dog->fleas[0]);
+	}
+
+	public function testDogHasNoFleas() {
+		$dog = MockDogModel::find('first', array(
+			'_id' => $this->dog2->_id,
+		), array(
+			'with' => array(
+				'MockFleas',
+			),
+		));
+		$this->assertNotInternalType('array', $dog->fleas);
 	}
 
 }

@@ -44,11 +44,20 @@ class Model {
 	 *
 	 * @var array
 	 */
-	public static $relationships = array('hasMany', 'hasOne');
+	public static $relationships = array(
+		'hasMany',
+		'hasManyEmbedded',
+		'hasOne',
+		'hasOneEmbedded',
+	);
 
 	public $hasMany = array();
 
+	public $hasManyEmbedded = array();
+
 	public $hasOne = array();
+
+	public $hasOneEmbedded = array();
 
 	/**
 	 * Relationship classes
@@ -56,6 +65,8 @@ class Model {
 	 * @var array
 	 */
 	public static $classes = array(
+		'hasManyEmbedded' => 'li3_fake_model\extensions\data\relationships\HasManyEmbedded',
+		'hasOneEmbedded' => 'li3_fake_model\extensions\data\relationships\HasOneEmbedded',
 		'hasMany' => 'li3_fake_model\extensions\data\relationships\HasMany',
 		'hasOne' => 'li3_fake_model\extensions\data\relationships\HasOne',
 		'database' => 'li3_fake_model\extensions\data\source\FakeMongoDb',
