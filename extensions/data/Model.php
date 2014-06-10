@@ -229,10 +229,10 @@ class Model extends StaticObject {
 			$with = $self::mergeWith($options['with']);
 			unset($options['with']);
 
-			$query = new Query($options + array(
+			$query = new Query(array(
 				'model' => $class,
 				'conditions' => $conditions,
-			));
+			) + $options);
 			$db = $self::connection();
 			$results = $db->read($query);
 			foreach ($results as &$result) {

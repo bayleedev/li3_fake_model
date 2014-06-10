@@ -355,9 +355,7 @@ class ModelTest extends Unit {
 		$class = 'li3_fake_model\tests\mocks\extensions\data\MockModel';
 		$this->assertQueryCount($class, 2, function() {
 			MockModel::all(array(), array(
-				'with' => array(
-					'MockChildModel',
-				),
+				'with' => array('MockChildModel'),
 			));
 		});
 	}
@@ -413,20 +411,17 @@ class ModelTest extends Unit {
 		);
 		$this->assertQueries($class, $queries, function() {
 			MockModel::first(array(), array(
-				'with' => array(
-					'MockChildModel',
-				),
+				'with' => array('MockChildModel'),
 			));
 		});
 	}
 
 	public function testHasOneRelationshipWithArrayOfForeignKeys() {
-		$class = 'li3_fake_model\tests\mocks\extensions\data\MockMasterModel';
 		$dog1 = new MockDogModel(array('name' => 'Fido', 'age' => 1));
 		$dog1->save();
 		$dog2 = new MockDogModel(array('name' => 'Roofy', 'age' => 5));
 		$dog2->save();
-		$master = new MockMasterModel(array('dog_ids' => array($dog1->_id, $dog2->_id)));
+		$master = new MockMasterModel(array('dog_id' => array($dog1->_id, $dog2->_id)));
 		$master->save();
 		$master = MockMasterModel::first(array(), array(
 			'with' => array('FavoriteDog')
@@ -448,13 +443,11 @@ class ModelTest extends Unit {
 		$this->assertCount(2, $bone->dogs);
 	}
 
-	public function testDogHasFlea() {
+	public function testDogHasEmbeddedFlea() {
 		$dog = MockDogModel::find('first', array(
 			'_id' => $this->dog2->_id,
 		), array(
-			'with' => array(
-				'MockFlea',
-			),
+			'with' => array('MockFlea'),
 		));
 		$this->assertInstanceOf('li3_fake_model\tests\mocks\extensions\data\MockFleaModel', $dog->flea);
 	}
@@ -463,9 +456,7 @@ class ModelTest extends Unit {
 		$dog = MockDogModel::find('first', array(
 			'_id' => $this->dog->_id,
 		), array(
-			'with' => array(
-				'MockFlea',
-			),
+			'with' => array('MockFleas'),
 		));
 		$this->assertNotInstanceOf('li3_fake_model\tests\mocks\extensions\data\MockFleaModel', $dog->flea);
 	}
@@ -474,9 +465,7 @@ class ModelTest extends Unit {
 		$dog = MockDogModel::find('first', array(
 			'_id' => $this->dog->_id,
 		), array(
-			'with' => array(
-				'MockFleas',
-			),
+			'with' => array('MockFleas'),
 		));
 		$this->assertInternalType('array', $dog->fleas);
 		$this->assertInstanceOf('li3_fake_model\tests\mocks\extensions\data\MockFleaModel', $dog->fleas[0]);
@@ -486,11 +475,53 @@ class ModelTest extends Unit {
 		$dog = MockDogModel::find('first', array(
 			'_id' => $this->dog2->_id,
 		), array(
-			'with' => array(
-				'MockFleas',
-			),
+			'with' => array('MockFleas'),
 		));
 		$this->assertNotInternalType('array', $dog->fleas);
+	}
+
+	public function testRelationshipWithOptionsInRelationship() {
+		$class = 'li3_fake_model\tests\mocks\extensions\data\MockMasterModel';
+		$dog = new MockDogModel(array('name' => 'Fido', 'age' => 1));
+		$dog->save();
+		$master = new MockMasterModel(array('dog_id' => array($dog->_id)));
+		$master->save();
+		$queries = array(
+			array(
+				'name' => 'mock_master_models',
+				'limit' => 1,
+			),
+			array(
+				'name' => 'mock_dog_models',
+				'conditions' => array(
+					'_id' => array(
+						'$in' => array($dog->_id),
+					),
+				),
+				'order' => array(
+					'age' => -1,
+					'name' => 1,
+				),
+			),
+			array(
+				'name' => 'mock_grandchild_models',
+				'conditions' => array(
+					'dog_id' => array(
+						'$in' => array($dog->_id),
+					),
+					'name' => 'jim',
+				),
+			),
+		);
+		$this->assertQueries($class, $queries, function() {
+			MockMasterModel::first(array(), array(
+				'with' => array(
+					'FavoriteDogs' => array(
+						'order' => array('name' => 'asc'),
+					),
+				),
+			));
+		});
 	}
 
 }

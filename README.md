@@ -49,10 +49,10 @@ class Posts extends Model {
 
   public $hasMany = array(
     'Comments' => array(
-      'to'        => 'Comments',
-      'key'       => array('_id' => 'comment_id'),
-      // or, you can use an array of foreign keys, e.g. array('comment_ids' => '_id')
-      'fieldName' => 'comments',
+      'to'        => 'Comments',  // The model
+      'key'       => array('_id' => 'comment_id'), // or, you can use an array of foreign keys, e.g. array('comment_ids' => '_id')
+      'fieldName' => 'comments',  // The key it's on
+      // `order`, `limit`, `conditions` can also be used
     ),
   );
 
@@ -72,6 +72,20 @@ The above query will:
 1. query and fetch all the posts
 2. issue a second query to get all the comments
 3. connect the child comments onto the appropriate parent posts
+
+Relationships can also provide deep query logic:
+```php
+$posts = Posts::all(array(
+  'with' => array(
+    'comments' => array(
+      'order' => array('date' => 'asc'),
+      'limit' => 10,
+      'conditions' => array(
+        'flagged' => false,
+      ),
+    ),
+));
+```
 
 Relationships can also be nested further, e.g.:
 
