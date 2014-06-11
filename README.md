@@ -49,10 +49,10 @@ class Posts extends Model {
 
   public $hasMany = array(
     'Comments' => array(
-      'to'        => 'Comments',
-      'key'       => array('_id' => 'comment_id'),
-      // or, you can use an array of foreign keys, e.g. array('comment_ids' => '_id')
-      'fieldName' => 'comments',
+      'to'        => 'Comments',  // The model
+      'key'       => array('_id' => 'comment_id'), // or, you can use an array of foreign keys, e.g. array('comment_ids' => '_id')
+      'fieldName' => 'comments',  // The key it's on
+      // `order`, `limit`, `conditions` can also be used
     ),
   );
 
@@ -73,6 +73,20 @@ The above query will:
 2. issue a second query to get all the comments
 3. connect the child comments onto the appropriate parent posts
 
+Relationships can also provide deep query logic:
+```php
+$posts = Posts::all(array(
+  'with' => array(
+    'comments' => array(
+      'order' => array('date' => 'asc'),
+      'limit' => 10,
+      'conditions' => array(
+        'flagged' => false,
+      ),
+    ),
+));
+```
+
 Relationships can also be nested further, e.g.:
 
 ```php
@@ -86,12 +100,4 @@ $posts = Posts::all(array(
 This method call still only issues 3 total queries to the Mongo database, yipee!
 
 ## Copyright and License
-
-Copyright (c) Blaine Schmeisser
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rightsto use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Fake model is licensed under the MIT License - see the `LICENSE` file for details

@@ -26,13 +26,17 @@ class HasOne extends Relation {
 		}
 		$class = $this->meta['to'];
 		return ($this->results = $class::all(
-			array(
+			$this->conditions(),
+			$this->queryOptions()
+		));
+	}
+
+	public function conditions() {
+		return array(
 				current($this->meta['key']) => array(
 					'$in' => $this->retrieveFields(),
 				),
-			),
-			$this->options()
-		));
+			) + parent::conditions();
 	}
 
 }

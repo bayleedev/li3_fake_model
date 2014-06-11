@@ -4,7 +4,7 @@
 	"description": "Lithium PHP alternative (fast) model implementation",
 	"keywords": ["relations", "li3", "lithium", "models"],
 	"homepage": "https://github.com/BlaineSch/li3_fake_model",
-	"license": "GNU General Public License",
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Blaine Schmeisser",

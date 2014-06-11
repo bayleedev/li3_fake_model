@@ -7,8 +7,9 @@ use lithium\util\Inflector;
 use lithium\data\entity\Document;
 use lithium\core\ConfigException;
 use li3_fake_model\extensions\data\model\Query;
+use lithium\core\StaticObject;
 
-class Model {
+class Model extends StaticObject {
 
 	// Primary key identifier
 	public $primaryKey = '_id';
@@ -219,27 +220,31 @@ class Model {
 	 * @return mixed
 	 */
 	public static function find($type, $conditions = array(), $options = array()) {
-		$options += array(
-			'with' => array(),
-		);
-		$with = static::mergeWith($options['with']);
-		unset($options['with']);
+		$class = get_called_class();
+		return static::_filter(__FUNCTION__, compact('type', 'conditions', 'options'), function($self, $params) use($class) {
+			extract($params);
+			$options += array(
+				'with' => array(),
+			);
+			$with = $self::mergeWith($options['with']);
+			unset($options['with']);
 
-		$query = new Query($options + array(
-			'model' => get_called_class(),
-			'conditions' => $conditions,
-		));
-		$db = static::connection();
-		$results = $db->read($query);
-		foreach ($results as &$result) {
-			$result = new static($result);
-		}
-		$results = static::relationships($results, $with);
+			$query = new Query(array(
+				'model' => $class,
+				'conditions' => $conditions,
+			) + $options);
+			$db = $self::connection();
+			$results = $db->read($query);
+			foreach ($results as &$result) {
+				$result = new $self($result);
+			}
+			$results = $self::relationships($results, $with);
 
-		if ($type === 'first' && count($results) > 0) {
-			return $results[0];
-		}
-		return $results;
+			if ($type === 'first' && count($results) > 0) {
+				return $results[0];
+			}
+			return $results;
+		});
 	}
 
 	/**
