@@ -27,7 +27,7 @@ class HasMany extends Relation {
 	}
 
 	public function compare($type, $result1, $result2) {
-		if ($type === 'hasOne') {
+		if ($type === 'hasOne' || (!is_array($result1) && !is_array($result2))) {
 			return $result1 == $result2;
 		}
 		if (!is_array($result2)) {
