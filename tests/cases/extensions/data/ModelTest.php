@@ -524,4 +524,22 @@ class ModelTest extends Unit {
 		});
 	}
 
+	public function testSaveWithRelationship() {
+		$dog1 = new MockDogModel(array('name' => 'Fido', 'age' => 1));
+		$master = new MockMasterModel(array('name' => 'Henry'));
+		$master->favoriteDog = $dog1;
+		$master->save();
+		$dog1->save();
+		$this->assertEqual($dog1->_id, $master->dog_id);
+	}
+
+	public function testSaveMultipleWithRelationship() {
+		$dog1 = new MockDogModel(array('name' => 'Fido', 'age' => 1));
+		$dog2 = new MockDogModel(array('name' => 'Sparky', 'age' => 2));
+		$master = new MockMasterModel(array('name' => 'Henry'));
+		$master->favoriteDog = array($dog1, $dog2);
+		$master->save();
+		$this->assertEqual(array($dog1->_id, $dog2->_id), $master->dog_id);
+	}
+
 }

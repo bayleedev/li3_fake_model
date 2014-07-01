@@ -110,6 +110,8 @@ class Model extends StaticObject {
 	 * @return  array
 	 */
 	public function save() {
+		$this->saveRelationships();
+		$this->appendRelationshipData();
 		$type = $this->exists() ? 'update' : 'create';
 		$doc = new Document();
 		$doc->set($this->data);
@@ -166,9 +168,11 @@ class Model extends StaticObject {
 	 * @return  mixed
 	 */
 	public function __set($prop, $val) {
-		if (isset($this->relData[$prop])) {
-			return ($this->relData[$prop] = $val);
+		// already set
+		if ($this->isRelational($prop)) {
+			return $this->relData[$prop] = $val;
 		}
+		// Needs to set
 		return ($this->data[$prop] = $val);
 	}
 
@@ -421,6 +425,73 @@ class Model extends StaticObject {
 			static::$_instances[$class] = new $class();
 		}
 		return static::$_instances[$class];
+	}
+
+	// TODO Should eventually be moved to a Relationship object
+	protected function isRelational($key) {
+		return count($this->relationshipsByKey($key)) > 0;
+	}
+
+	// TODO Should eventually be moved to a Relationship object
+	public function mergeValue($value, $new) {
+		if (is_array($value)) {
+			$value[] = $new;
+		} elseif (!empty($value)) {
+			$value = array($value, $new);
+		} else {
+			$value = array($new);
+		}
+		$value = array_unique($value);
+		if (count($value) == 1) {
+			return $value[0];
+		}
+		return $value;
+	}
+
+	// TODO Should eventually be moved to a Relationship object
+	public function relationshipsByKey($key) {
+		$relationships = array();
+		foreach (array_merge($this->hasOne, $this->hasMany) as $rel) {
+			if ($rel['fieldName'] == $key) {
+				$relationships[] = $rel;
+			}
+		}
+		return $relationships;
+	}
+
+	// TODO Should eventually be moved to a Relationship object
+	public function saveRelationships() {
+		return $this->eachRelationship(function($key, $data) {
+			$data->save();
+		});
+	}
+
+	public function appendRelationshipData() {
+		return $this->eachRelationship(function($key, $data, $model) {
+			$relationships = $model->relationshipsByKey($key);
+			foreach ($relationships as $relationship) {
+				$myKey = key($relationship['key']);
+				$theirKey = current($relationship['key']);
+				if ($myKey == '_id') {
+					$data->$theirKey = $model->mergeValue($data->$theirKey, $model->$myKey);
+					$data->save();
+				} else {
+					$model->$myKey = $model->mergeValue($model->$myKey, $data->$theirKey);
+				}
+			}
+		});
+	}
+
+	public function eachRelationship($callback) {
+		foreach ($this->relData as $key => $value){
+			if (!is_array($value)) {
+				$value = array($value);
+			}
+			foreach ($value as $data) {
+				$callback($key, $data, $this);
+			}
+		}
+		return true;
 	}
 
 }
