@@ -8,6 +8,7 @@ use lithium\data\entity\Document;
 use lithium\core\ConfigException;
 use li3_fake_model\extensions\data\model\Query;
 use lithium\core\StaticObject;
+use MongoId;
 
 class Model extends StaticObject {
 
@@ -116,7 +117,7 @@ class Model extends StaticObject {
 		$this->appendRelationshipData();
 		$type = $this->exists() ? 'update' : 'create';
 		$doc = new Document();
-		$doc->set($this->data);
+		$doc->set($this->to_a());
 		$query = new Query(array(
 			'entity' => $doc,
 			'model' => get_class($this),
@@ -129,6 +130,19 @@ class Model extends StaticObject {
 		$exported = $doc->export();
 		$this->data[$this->primaryKey] = $exported['update'][$this->primaryKey];
 		return $result;
+	}
+
+	public function to_a($data = null) {
+		if (is_null($data)) $data = $this->data;
+		foreach ($data as $key => &$value) {
+			if (is_object($value) && !($value instanceof MongoId)) {
+				$value = $value->to_a();
+			}
+			if (is_array($value)) {
+				$value = $this->to_a($value);
+			}
+		}
+		return $data;
 	}
 
 	/**

@@ -542,4 +542,11 @@ class ModelTest extends Unit {
 		$this->assertEqual(array($dog1->_id, $dog2->_id), $master->dog_id);
 	}
 
+	public function testFindById() {
+		$dog1 = new MockDogModel(array('name' => 'Fido', 'age' => 1));
+		$dog1->save();
+		$dog = MockDogModel::first(array('_id' => $dog1->_id));
+		$this->assertEqual('Fido', $dog->name);
+	}
+
 }
