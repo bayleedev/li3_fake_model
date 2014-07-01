@@ -92,7 +92,9 @@ class Model extends StaticObject {
 	 * @param array $data - data to store in database
 	 */
 	public function __construct($data=array()) {
-		$this->data = $data;
+		foreach ($data as $key => $value) {
+			$this->$key = $value;
+		}
 	}
 
 	/**
@@ -170,6 +172,10 @@ class Model extends StaticObject {
 	public function __set($prop, $val) {
 		// already set
 		if ($this->isRelational($prop)) {
+			if (empty($val)) {
+				unset($this->relData[$prop]);
+				return;
+			}
 			return $this->relData[$prop] = $val;
 		}
 		// Needs to set
