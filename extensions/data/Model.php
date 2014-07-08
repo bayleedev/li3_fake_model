@@ -62,6 +62,11 @@ class Model extends StaticObject {
 	public $hasOneEmbedded = array();
 
 	/**
+	 * Options array
+	 */
+	protected $_options = array();
+
+	/**
 	 * Relationship classes
 	 *
 	 * @var array
@@ -91,8 +96,12 @@ class Model extends StaticObject {
 	 * Note: does not save to the database.
 	 *
 	 * @param array $data - data to store in database
+	 * @param array $options - options of the model
 	 */
-	public function __construct($data=array()) {
+	public function __construct($data = array(), $options = array()) {
+		$this->_options = $options + array(
+			'exists' => false,
+		);
 		foreach ($data as $key => $value) {
 			$this->$key = $value;
 		}
@@ -103,8 +112,11 @@ class Model extends StaticObject {
 	 *
 	 * @return  bool
 	 */
-	public function exists() {
-		return !is_null($this->{$this->primaryKey});
+	public function exists($value = null) {
+		if (!is_null($value)) {
+			return $this->_options['exists'] = $value;
+		}
+		return $this->_options['exists'];
 	}
 
 	/**
@@ -128,10 +140,20 @@ class Model extends StaticObject {
 		$db = static::connection();
 		$result = $db->{$type}($query);
 		$exported = $doc->export();
+		$this->exists(true);
 		$this->data[$this->primaryKey] = $exported['update'][$this->primaryKey];
 		return $result;
 	}
 
+	/**
+	 * Converts the model to an array representing it's contents.
+	 *
+	 * Not exactly just the data, since we support embedded relationships.
+	 * Maybe it could check if any of those are present, if not just return the raw
+	 * data?
+	 *
+	 * @return array
+	 */
 	public function to_a($data = null) {
 		if (is_null($data)) $data = $this->data;
 		foreach ($data as $key => &$value) {
@@ -205,8 +227,8 @@ class Model extends StaticObject {
 	 * @param   array $data
 	 * @return  object
 	 */
-	public static function create($data=array()) {
-		return new static($data);
+	public static function create($data = array(), $options = array()) {
+		return new static($data, $options);
 	}
 
 	/**
@@ -260,7 +282,7 @@ class Model extends StaticObject {
 			$db = $self::connection();
 			$results = $db->read($query);
 			foreach ($results as &$result) {
-				$result = new $self($result);
+				$result = new $self($result, array('exists' => true));
 			}
 			$results = $self::relationships($results, $with);
 
