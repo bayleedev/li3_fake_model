@@ -102,8 +102,17 @@ class Model extends StaticObject {
 		$this->_options = $options + array(
 			'exists' => false,
 		);
+		$this->set($data);
+	}
+
+	/**
+	 * Set data on the model in bulk.
+	 *
+	 * @return null
+	 */
+	public function set($data) {
 		foreach ($data as $key => $value) {
-			$this->$key = $value;
+			$this->__set($key, $value);
 		}
 	}
 
