@@ -9,6 +9,7 @@ use li3_fake_model\tests\mocks\extensions\data\MockRealModel;
 use li3_fake_model\tests\mocks\extensions\data\MockDogModel;
 use li3_fake_model\tests\mocks\extensions\data\MockMasterModel;
 use li3_fake_model\tests\mocks\extensions\data\MockBoneModel;
+use li3_fake_model\tests\mocks\extensions\data\MockGermModel;
 use li3_fake_model\extensions\test\Unit;
 
 use lithium\data\Connections;
@@ -559,6 +560,76 @@ class ModelTest extends Unit {
 	public function testExistsWithPresetId() {
 		$dog1 = new MockDogModel(array('_id' => 1234));
 		$this->assertFalse($dog1->exists());
+	}
+
+	public function testEmbeddedRelationshipWithRelationship() {
+		$this->tearDown();
+		$germ = new MockGermModel(array('_id' => 1, 'name' => 'Jake'));
+		$germ->save();
+		$dog1 = new MockDogModel(array(
+			'_id' => 1234,
+			'flea' => array(
+				'size' => 'small',
+				'germ_ids' => array($germ->_id),
+			),
+		));
+		$dog1->save();
+		$dog2 = new MockDogModel(array(
+			'_id' => 1235,
+			'flea' => array(
+				'size' => 'large',
+				'germ_ids' => array($germ->_id),
+			),
+		));
+		$dog2->save();
+		$dogs = MockDogModel::all(array(), array(
+			'with' => array('MockFlea'),
+		));
+
+		$this->assertCount(2, $dogs);
+		$this->assertCount(1, $dogs[0]->flea->germs);
+		$germClass = 'li3_fake_model\tests\mocks\extensions\data\MockGermModel';
+		$this->assertInstanceOf($germClass, $dogs[0]->flea->germs[0]);
+	}
+
+	public function testEmbeddedRelationshipWithRelationshipQueries() {
+		$germ = new MockGermModel(array('_id' => 1, 'name' => 'Jake'));
+		$germ->save();
+		$dog1 = new MockDogModel(array(
+			'_id' => 1234,
+			'flea' => array(
+				'size' => 'small',
+				'germ_ids' => array($germ->_id),
+			),
+		));
+		$dog1->save();
+		$dog2 = new MockDogModel(array(
+			'_id' => 1235,
+			'flea' => array(
+				'size' => 'large',
+				'germ_ids' => array($germ->_id),
+			),
+		));
+		$dog2->save();
+		$queries = array(
+			array(
+				'name' => 'mock_dog_models',
+			),
+			array(
+				'name' => 'mock_germ_models',
+				'conditions' => array(
+					'_id' => array(
+						'$in' => array($germ->_id),
+					),
+				),
+			),
+		);
+		$class = 'li3_fake_model\tests\mocks\extensions\data\MockDogModel';
+		$this->assertQueries($class, $queries, function() {
+			MockDogModel::all(array(), array(
+				'with' => array('MockFlea'),
+			));
+		});
 	}
 
 }

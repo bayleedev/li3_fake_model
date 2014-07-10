@@ -10,6 +10,9 @@ class MockDogModel extends Model {
 		'MockFlea' => array(
 			'to'        => 'li3_fake_model\tests\mocks\extensions\data\MockFleaModel',
 			'fieldName' => 'flea',
+			'with'      => array(
+				'Germs',
+			),
 		),
 	);
 
@@ -17,6 +20,9 @@ class MockDogModel extends Model {
 		'MockFleas' => array(
 			'to'        => 'li3_fake_model\tests\mocks\extensions\data\MockFleaModel',
 			'fieldName' => 'fleas',
+			'with'      => array(
+				'Germs',
+			),
 		),
 	);
 

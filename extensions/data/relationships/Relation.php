@@ -72,6 +72,7 @@ abstract class Relation {
 		$fields = array();
 		$currentField = key($this->meta['key']);
 		foreach ($this->data as $key => $data) {
+			if (empty($data->data[$currentField])) continue;
 			if (is_array($data->data[$currentField])) {
 				$fields = array_merge($fields, $data->data[$currentField]);
 			} else {

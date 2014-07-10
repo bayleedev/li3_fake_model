@@ -366,7 +366,7 @@ class Model extends StaticObject {
 	}
 
 	/**
-	 * Retrusn a given relationship or throws `lithium\core\ConfigException`.
+	 * Returns a given relationship or throws `lithium\core\ConfigException`.
 	 *
 	 * @param  string $name
 	 * @return string
@@ -375,7 +375,7 @@ class Model extends StaticObject {
 		if (strrpos($name, '\\') !== false) {
 			$name = substr($name, strrpos($name, '\\') + 1);
 		}
-		foreach(static::$relationships as $type) {
+		foreach (static::$relationships as $type) {
 			if (!empty($this->{$type}) && isset($this->{$type}[$name])) {
 				return new static::$classes[$type]($this->{$type}[$name]);
 			}
