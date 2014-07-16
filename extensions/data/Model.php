@@ -9,6 +9,7 @@ use lithium\core\ConfigException;
 use li3_fake_model\extensions\data\model\Query;
 use lithium\core\StaticObject;
 use MongoId;
+use MongoDate;
 
 class Model extends StaticObject {
 
@@ -166,7 +167,7 @@ class Model extends StaticObject {
 	public function to_a($data = null) {
 		if (is_null($data)) $data = $this->data;
 		foreach ($data as $key => &$value) {
-			if (is_object($value) && !($value instanceof MongoId)) {
+			if (is_object($value) && !($value instanceof MongoId) && !($value instanceof MongoDate)) {
 				$value = $value->to_a();
 			}
 			if (is_array($value)) {
