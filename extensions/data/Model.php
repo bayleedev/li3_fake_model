@@ -24,7 +24,7 @@ class Model extends StaticObject {
 	public static $connectionName = 'default';
 
 	// store cached copy of connection
-	static protected $cachedConnection = null;
+	static protected $cachedConnection = array();
 
 	/**
 	 * Raw data.
@@ -421,17 +421,18 @@ class Model extends StaticObject {
 	 * @return  object Connection
 	 */
 	public static function connection() {
-		if (!isset(static::$cachedConnection)) {
-			$conn = Connections::get(static::$connectionName);
+		$name = static::$connectionName;
+		if (empty(static::$cachedConnection[$name])) {
+			$conn = Connections::get($name);
 			$connClass = get_class($conn);
 			if (preg_match('/MongoDb/', $connClass)) {
 				$db = static::$classes['database'];
-				static::$cachedConnection = new $db($conn);
+				static::$cachedConnection[$name] = new $db($conn);
 			} else {
-				throw new ConfigException('not yet implemented');
+				static::$cachedConnection[$name] = $conn;
 			}
 		}
-		return static::$cachedConnection;
+		return static::$cachedConnection[$name];
 	}
 
 	/**
