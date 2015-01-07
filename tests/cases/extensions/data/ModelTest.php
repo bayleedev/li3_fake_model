@@ -128,21 +128,25 @@ class ModelTest extends Unit {
 	public function testFirstWithCondition() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
-		$found = MockModel::first(array('bar' => 'buz'));
+		$found = MockModel::first(array(
+			'conditions' => array(
+				'bar' => 'buz',
+			),
+		));
 		$this->assertEqual($record, $found);
 	}
 
 	public function testFirstWithOffset() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
-		$found = MockModel::first(array(), array('offset' => 1));
+		$found = MockModel::first(array('offset' => 1));
 		$this->assertEqual($record, $found);
 	}
 
 	public function testFirstWithOrder() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
-		$found = MockModel::first(array(), array('order' => array('bar' => 'desc')));
+		$found = MockModel::first(array('order' => array('bar' => 'desc')));
 		$this->assertEqual($record, $found);
 	}
 
@@ -156,21 +160,25 @@ class ModelTest extends Unit {
 	public function testAllWithCondition() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
-		$records = MockModel::all(array('bar' => 'buz'));
+		$records = MockModel::all(array(
+			'conditions' => array(
+				'bar' => 'buz',
+			),
+		));
 		$this->assertEqual(array($record), $records);
 	}
 
 	public function testAllWithLimitAndOffset() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
-		$records = MockModel::all(array(), array('limit' => 1, 'offset' => 1));
+		$records = MockModel::all(array('limit' => 1, 'offset' => 1));
 		$this->assertEqual(array($record), $records);
 	}
 
 	public function testAllWithOrder() {
 		$record = new MockModel(array('bar' => 'buz'));
 		$record->save();
-		$records = MockModel::all(array(), array('order' => array('bar' => 'desc')));
+		$records = MockModel::all(array('order' => array('bar' => 'desc')));
 		$this->assertEqual(array($record, $this->parent), $records);
 	}
 
@@ -184,7 +192,7 @@ class ModelTest extends Unit {
 	}
 
 	public function testRelationalDataIsset() {
-		$person = MockGrandchildModel::first(array(), array(
+		$person = MockGrandchildModel::first(array(
 			'with' => array('MockDogModel'),
 		));
 		$this->assertIdentical(true, isset($person->dog));
@@ -218,11 +226,15 @@ class ModelTest extends Unit {
 		if(!isset($_GET['benchmark'])) return;
 		for($i=0; $i<100; $i++) {
 			$record = MockModel::create(array(
-				'foo' => 'bar'
+				'conditions' => array(
+					'foo' => 'bar'
+				),
 			));
 			$record->save();
 			$record = MockRealModel::create(array(
-				'foo' => 'bar'
+				'conditions' => array(
+					'foo' => 'bar'
+				),
 			));
 			$record->save();
 		}
@@ -245,42 +257,42 @@ class ModelTest extends Unit {
 	}
 
 	public function testFirstLevelRelationCount() {
-		$parent = MockModel::first(array(), array(
+		$parent = MockModel::first(array(
 			'with' => array('MockChildModel'),
 		));
 		$this->assertCount(1, $parent->children);
 	}
 
 	public function testFirstLevelRelationItem() {
-		$parent = MockModel::first(array(), array(
+		$parent = MockModel::first(array(
 			'with' => array('MockChildModel'),
 		));
 		$this->assertEqual($this->child, $parent->children[0]);
 	}
 
 	public function testParentItem() {
-		$item = MockGrandchildModel::first(array(), array(
+		$item = MockGrandchildModel::first(array(
 			'with' => array('MockChildModel'),
 		));
 		$this->assertEqual($this->child, $item->parent);
 	}
 
 	public function testHasOneToHasOneRelationshiopPersonWithDog() {
-		$person = MockGrandchildModel::first(array(), array(
+		$person = MockGrandchildModel::first(array(
 			'with' => array('MockDogModel'),
 		));
 		$this->assertEqual($this->dog, $person->dog);
 	}
 
 	public function testHasOneToHasOneRelationshiopDogWithPerson() {
-		$dog = MockDogModel::first(array(), array(
+		$dog = MockDogModel::first(array(
 			'with' => array('MockGrandchildModel'),
 		));
 		$this->assertEqual($this->grandchild, $dog->owner);
 	}
 
 	public function testTwoLevelRelationshipHasCorrectResults() {
-		$child = MockChildModel::first(array(), array(
+		$child = MockChildModel::first(array(
 			'with' => array(
 				'MockGrandchildModel' => array(
 					'with' => array('MockDogModel'),
@@ -293,7 +305,7 @@ class ModelTest extends Unit {
 	public function testTwoLevelRelationshipHasCorrectQueryCount() {
 		$class = 'li3_fake_model\tests\mocks\extensions\data\MockChildModel';
 		$this->assertQueryCount($class, 3, function() {
-			MockChildModel::first(array(), array(
+			MockChildModel::first(array(
 				'with' => array(
 					'MockGrandchildModel' => array(
 						'with' => array('MockDogModel'),
@@ -304,7 +316,7 @@ class ModelTest extends Unit {
 	}
 
 	public function testThreeLevelRelationshipHasCorrectResults() {
-		$model = MockModel::first(array(), array(
+		$model = MockModel::first(array(
 			'with' => array(
 				'MockChildModel' => array(
 					'with' => array(
@@ -321,7 +333,7 @@ class ModelTest extends Unit {
 	public function testThreeLevelRelationshipHasCorrectQueryCount() {
 		$class = 'li3_fake_model\tests\mocks\extensions\data\MockModel';
 		$this->assertQueryCount($class, 4, function() {
-			MockModel::first(array(), array(
+			MockModel::first(array(
 				'with' => array(
 					'MockChildModel' => array(
 						'with' => array(
@@ -355,7 +367,7 @@ class ModelTest extends Unit {
 		}
 		$class = 'li3_fake_model\tests\mocks\extensions\data\MockModel';
 		$this->assertQueryCount($class, 2, function() {
-			MockModel::all(array(), array(
+			MockModel::all(array(
 				'with' => array('MockChildModel'),
 			));
 		});
@@ -381,7 +393,7 @@ class ModelTest extends Unit {
 			),
 		);
 		$this->assertQueries($class, $queries, function() {
-			MockModel::first(array(), array(
+			MockModel::first(array(
 				'with' => array(
 					'MockChildModel' => array(
 						'limit' => 12,
@@ -411,7 +423,7 @@ class ModelTest extends Unit {
 			),
 		);
 		$this->assertQueries($class, $queries, function() {
-			MockModel::first(array(), array(
+			MockModel::first(array(
 				'with' => array('MockChildModel'),
 			));
 		});
@@ -424,21 +436,27 @@ class ModelTest extends Unit {
 		$dog2->save();
 		$master = new MockMasterModel(array('dog_id' => array($dog1->_id, $dog2->_id)));
 		$master->save();
-		$master = MockMasterModel::first(array(), array(
+		$master = MockMasterModel::first(array(
 			'with' => array('FavoriteDog')
 		));
 		$this->assertEqual($dog2, $master->favoriteDog);
 	}
 
 	public function testHasManyToHasManyRelOnParent() {
-		$dog = MockDogModel::first(array('name' => 'Fido'), array(
+		$dog = MockDogModel::first(array(
+			'conditions' => array(
+				'name' => 'Fido',
+			),
 			'with' => array('Bones'),
 		));
 		$this->assertCount(2, $dog->bones);
 	}
 
 	public function testHasManyToHasManyRelOnChild() {
-		$bone = MockBoneModel::first(array('name' => 'Antler'), array(
+		$bone = MockBoneModel::first(array(
+			'conditions' => array(
+				'name' => 'Antler',
+			),
 			'with' => array('Dogs'),
 		));
 		$this->assertCount(2, $bone->dogs);
@@ -446,8 +464,9 @@ class ModelTest extends Unit {
 
 	public function testDogHasEmbeddedFlea() {
 		$dog = MockDogModel::find('first', array(
-			'_id' => $this->dog2->_id,
-		), array(
+			'conditions' => array(
+				'_id' => $this->dog2->_id,
+			),
 			'with' => array('MockFlea'),
 		));
 		$this->assertInstanceOf('li3_fake_model\tests\mocks\extensions\data\MockFleaModel', $dog->flea);
@@ -455,8 +474,9 @@ class ModelTest extends Unit {
 
 	public function testDogHasNoFlea() {
 		$dog = MockDogModel::find('first', array(
-			'_id' => $this->dog->_id,
-		), array(
+			'conditions' => array(
+				'_id' => $this->dog->_id,
+			),
 			'with' => array('MockFleas'),
 		));
 		$this->assertNotInstanceOf('li3_fake_model\tests\mocks\extensions\data\MockFleaModel', $dog->flea);
@@ -464,8 +484,9 @@ class ModelTest extends Unit {
 
 	public function testDogHasFleas() {
 		$dog = MockDogModel::find('first', array(
-			'_id' => $this->dog->_id,
-		), array(
+			'conditions' => array(
+				'_id' => $this->dog->_id,
+			),
 			'with' => array('MockFleas'),
 		));
 		$this->assertInternalType('array', $dog->fleas);
@@ -474,8 +495,9 @@ class ModelTest extends Unit {
 
 	public function testDogHasNoFleas() {
 		$dog = MockDogModel::find('first', array(
-			'_id' => $this->dog2->_id,
-		), array(
+			'conditions' => array(
+				'_id' => $this->dog2->_id,
+			),
 			'with' => array('MockFleas'),
 		));
 		$this->assertNotInternalType('array', $dog->fleas);
@@ -515,7 +537,7 @@ class ModelTest extends Unit {
 			),
 		);
 		$this->assertQueries($class, $queries, function() {
-			MockMasterModel::first(array(), array(
+			MockMasterModel::first(array(
 				'with' => array(
 					'FavoriteDogs' => array(
 						'order' => array('name' => 'asc'),
@@ -546,14 +568,22 @@ class ModelTest extends Unit {
 	public function testFindById() {
 		$dog1 = new MockDogModel(array('name' => 'Fido', 'age' => 1));
 		$dog1->save();
-		$dog = MockDogModel::first(array('_id' => $dog1->_id));
+		$dog = MockDogModel::first(array(
+			'conditions' => array(
+				'_id' => $dog1->_id
+			)
+		));
 		$this->assertEqual('Fido', $dog->name);
 	}
 
 	public function testFindByCustomId() {
 		$dog1 = new MockDogModel(array('_id' => 1234, 'name' => 'Fido'));
 		$dog1->save();
-		$dog = MockDogModel::first(array('_id' => $dog1->_id));
+		$dog = MockDogModel::first(array(
+			'conditions' => array(
+				'_id' => $dog1->_id,
+			),
+		));
 		$this->assertEqual('Fido', $dog->name);
 	}
 
@@ -582,7 +612,7 @@ class ModelTest extends Unit {
 			),
 		));
 		$dog2->save();
-		$dogs = MockDogModel::all(array(), array(
+		$dogs = MockDogModel::all(array(
 			'with' => array('MockFlea'),
 		));
 
@@ -626,7 +656,7 @@ class ModelTest extends Unit {
 		);
 		$class = 'li3_fake_model\tests\mocks\extensions\data\MockDogModel';
 		$this->assertQueries($class, $queries, function() {
-			MockDogModel::all(array(), array(
+			MockDogModel::all(array(
 				'with' => array('MockFlea'),
 			));
 		});

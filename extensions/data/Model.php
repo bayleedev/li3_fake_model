@@ -245,24 +245,22 @@ class Model extends StaticObject {
 	 * Query all records from the database
 	 * and return as an array.
 	 *
-	 * @param   array $conditions
 	 * @param   array $options
 	 * @return  array
 	 */
-	public static function all($conditions = array(), $options = array()) {
-		return static::find('all', $conditions, $options);
+	public static function all($options = array()) {
+		return static::find('all', $options);
 	}
 
 	/**
 	 * Query a single record from the database
 	 * and return model instance.
 	 *
-	 * @param   array $conditions
 	 * @param   array $options
 	 * @return  mixed
 	 */
-	public static function first($conditions = array(), $options = array()) {
-		return static::find('first', $conditions, $options + array(
+	public static function first($options = array()) {
+		return static::find('first', $options + array(
 			'limit' => 1,
 		));
 	}
@@ -271,13 +269,15 @@ class Model extends StaticObject {
 	 * Generic find.
 	 *
 	 * @param  string $type       Type of find: 'all' or 'first'.
-	 * @param  array  $conditions
 	 * @param  array  $options
 	 * @return mixed
 	 */
-	public static function find($type, $conditions = array(), $options = array()) {
+	public static function find($type, array $options = array()) {
 		$class = get_called_class();
-		return static::_filter(__FUNCTION__, compact('type', 'conditions', 'options'), function($self, $params) use($class) {
+		$options += array(
+			'conditions' => array(),
+		);
+		return static::_filter(__FUNCTION__, compact('type', 'options'), function($self, $params) use($class) {
 			extract($params);
 			$options += array(
 				'with' => array(),
@@ -287,7 +287,7 @@ class Model extends StaticObject {
 
 			$query = new Query(array(
 				'model' => $class,
-				'conditions' => $conditions,
+				'conditions' => $options['conditions'],
 			) + $options);
 			$db = $self::connection();
 			$results = $db->read($query);
